@@ -1,0 +1,39 @@
+// Color Palette - Obsidian Violet Luxe Theme
+$bg-black: #000000;
+$bg-obsidian: #09090b;
+$bg-card: #121217;
+$bg-card-elevated: #181820;
+
+// Purple & Violet Gradients
+$purple-deep: #2e0854;
+$purple-dark: #3b0764;
+$purple-primary: #7c3aed;
+$purple-vibrant: #8b5cf6;
+$purple-neon: #a855f7;
+$purple-light: #c084fc;
+$purple-glow: rgba(168, 85, 247, 0.35);
+
+// Text Colors
+$text-white: #ffffff;
+$text-muted: #a1a1aa;
+$text-subtle: #71717a;
+$text-purple-light: #d8b4fe;
+
+// Borders & Dividers
+$border-glass: rgba(255, 255, 255, 0.1);
+$border-glass-hover: rgba(255, 255, 255, 0.2);
+$border-active: #a855f7;
+
+// Gradients
+$gradient-purple-hero: linear-gradient(135deg, #1f083d 0%, #350c60 50%, #4c117e 100%);
+$gradient-btn-primary: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #a855f7 100%);
+$gradient-btn-hover: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
+$gradient-google-border: linear-gradient(90deg, #4285f4, #9b51e0, #ea4335, #fbbc05);
+
+// Typography
+$font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+// Radii
+$radius-pill: 9999px;
+$radius-card: 20px;
+$radius-phone: 36px;

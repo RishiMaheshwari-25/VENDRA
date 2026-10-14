@@ -15,7 +15,7 @@ export async function sendTokenResponse(user,res,message){
             id:user._id,
             email:user.email,
             contact:user.contact,
-            role:isSeller?"seller":"buyer"
+            role:user.role
         }
     })
 
@@ -28,12 +28,12 @@ export async function registerController(req,res){
                 {email},{contact}
             ]
         })
-        if(!existingUser){
+        if(existingUser){
             res.status(404).json({
                 message:"User with this email or contact already exists"
             })
         }
-        const user=await userModel.create({fullname,email,contact,password})
+        const user=await userModel.create({fullname,email,contact,password,role:isSeller? "seller":"buyer"})
         await sendTokenResponse(user,res,"User Register Successfully")
 
     }catch(err){
@@ -46,3 +46,22 @@ export async function registerController(req,res){
     
 
 }
+export async function loginController(req,res){
+    
+        const {email,password}=req.body;
+        const user=await userModel.findOne({email});
+        if(!user){
+            res.status(400).json({
+                message:"Invalid email or password"
+            })
+        }
+        const isMatch=await user.comparePassword(password);
+        if(!isMatch){
+            return res.status(400).json({
+                message:"Invalid password"
+            })
+        }
+        await sendTokenResponse(user,res,"User LoggedIn Succesfully")
+
+    }
+

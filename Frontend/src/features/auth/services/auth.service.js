@@ -9,4 +9,8 @@ export const register=async ({email,password,contact,fullname,isSeller})=>{
         return response.data
      
 }
+export const login=async({email,password})=>{
+    const response=await api.post("/api/auth/login",{email,password});
+    return response.data;
+}
     
