@@ -64,4 +64,7 @@ export async function loginController(req,res){
         await sendTokenResponse(user,res,"User LoggedIn Succesfully")
 
     }
-
+export async function googleCallback(req,res){
+    console.log(req.user);
+    res.redirect("http://localhost:5173/")
+}

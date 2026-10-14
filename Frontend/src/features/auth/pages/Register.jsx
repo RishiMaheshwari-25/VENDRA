@@ -32,7 +32,9 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-
+  async function handleGoogleRegister(){
+      window.location.href = "/api/auth/google";
+    }
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -85,6 +87,7 @@ const Register = () => {
       // Error handled by useAuth or displayed via local error
       setLocalError(err?.response?.data?.message || err?.message || 'Failed to create account');
     }
+  
   };
 
   return (
@@ -408,7 +411,7 @@ const Register = () => {
           </div>
 
           {/* Continue with Google Button */}
-          <button type="button" className="btn-google">
+          <button onClick={handleGoogleRegister}type="button" className="btn-google">
             <svg viewBox="0 0 24 24">
               <path
                 d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
