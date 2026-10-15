@@ -9,19 +9,30 @@
 .register-page,
 .login-page {
   display: flex;
-  width: 100vw;
+  position: fixed;
+  inset: 0;
+  width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   height: 100vh;
+  height: 100dvh;
   background-color: $bg-black;
   color: $text-white;
   font-family: $font-family;
   overflow: hidden;
-  position: relative;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   @media (max-width: 1024px) {
+    position: absolute;
+    inset: 0 auto auto 0;
     flex-direction: column;
     height: auto;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-y: auto;
   }
 }
@@ -670,21 +681,19 @@
   overflow-y: auto;
   overflow-x: hidden;
   height: 100vh;
+  height: 100dvh;
   box-sizing: border-box;
+  scrollbar-width: none;
 
-  // Custom minimal scrollbar for tight viewports
   &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #27272a;
-    border-radius: 4px;
+    display: none;
   }
 
   @media (max-width: 1024px) {
     flex: 1;
     padding: 24px 20px;
     height: auto;
+    overflow-y: visible;
   }
 
   // Ambient corner glow
