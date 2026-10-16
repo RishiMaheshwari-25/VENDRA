@@ -12,10 +12,14 @@ dotenv.config();
   if(!process.env.GOOGLE_CLIENT_SECRET){
     throw new Error("GOOGLE CLIENT SECRET is not defined in the environment variable")
   }
+  if(!process.env.IMAGEKIT_PRIVATE_KEY){
+    throw new Error("Image kit private key  is not defined in the environment variable")
+  }
 export const config={
     MONGO_URI:process.env.MONGO_URI,
     JWT_SECRET:process.env.JWT_SECRET,
     GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET:process.env.GOOGLE_CLIENT_SECRET,
-    NODE_ENV:process.env.NODE_ENV
+    NODE_ENV:process.env.NODE_ENV,
+    IMAGEKIT_PRIVATE_KEY:process.env.IMAGEKIT_PRIVATE_KEY
 }
