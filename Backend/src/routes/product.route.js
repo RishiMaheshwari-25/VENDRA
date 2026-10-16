@@ -11,7 +11,7 @@ const productRouter=Router();
     }
  })
 
-productRouter.post("/",authenticateSeller,createProductValidator,upload.array("images",7),createproduct)
+productRouter.post("/",authenticateSeller,upload.array("images",7),createProductValidator,createproduct)
 productRouter.get("/seller",authenticateSeller,getSellerProducts)
 
 export default productRouter;
