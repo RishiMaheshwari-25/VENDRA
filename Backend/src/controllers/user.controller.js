@@ -14,6 +14,7 @@ export async function sendTokenResponse(user,res,message){
         user:{
             id:user._id,
             email:user.email,
+            fullname:user.fullname,
             contact:user.contact,
             role:user.role
         }
@@ -81,4 +82,19 @@ export async function googleCallback(req,res){
    },config.JWT_SECRET,{expiresIn:"7d"})
    res.cookie("token",token);
     res.redirect("http://localhost:5173/")
+}
+export async function getMeController(req,res){
+    const user=req.user;
+    res.status(200).json({
+        message:"User fetched successfully",
+         success:true,
+        user:{
+            fullname:user.fullname,
+            id:user.id,
+            email:user.email,
+            contact:user.contact,
+            role:user.role
+            
+        }
+    })
 }

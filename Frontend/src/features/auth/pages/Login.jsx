@@ -48,33 +48,37 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLocalError('');
-    setSuccessMsg('');
+  e.preventDefault();
+  setLocalError('');
+  setSuccessMsg('');
 
-    if (!formData.email.trim()) {
-      setLocalError('Please enter your email address');
-      return;
-    }
-    if (!formData.password) {
-      setLocalError('Please enter your password');
-      return;
-    }
+  if (!formData.email.trim()) {
+    setLocalError('Please enter your email address');
+    return;
+  }
 
-    try {
-      await handleLogin({
-        email: formData.email.trim(),
-        password: formData.password
-      });
-      setSuccessMsg('Signed in successfully! Redirecting...');
-      setTimeout(() => {
-        navigate('/');
-      }, 500);
-    } catch (err) {
-      setLocalError(err?.response?.data?.message || err?.message || 'Invalid credentials');
-    }
-  };
+  if (!formData.password) {
+    setLocalError('Please enter your password');
+    return;
+  }
 
+  try {
+    const user = await handleLogin({
+      email: formData.email.trim(),
+      password: formData.password
+    });
+
+    if (user.role === 'seller') {
+      navigate('/seller/dashboard');
+    } else {
+      navigate('/');
+    }
+  } catch (err) {
+    setLocalError(
+      err?.response?.data?.message || err?.message || 'Invalid credentials'
+    );
+  }
+};
   return (
     <div className="login-page">
       {/* ============================================================ */}
