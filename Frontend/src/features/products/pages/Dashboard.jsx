@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useProduct } from '../hooks/useProduct';
 import {
   Plus,
@@ -81,6 +81,7 @@ const CURRENCY_RATES = {
 };
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { handleGetSellerProduct } = useProduct();
   const rawSellerProducts = useSelector((state) => state.product?.sellerProducts);
   const isLoading = useSelector((state) => state.product?.loading);
@@ -498,15 +499,17 @@ const Dashboard = () => {
                       <div>
                         {/* 3:4 Portrait Image Frame */}
                         <div className="v-dashboard__product-card__image-wrap">
-                          <img
-                            src={imgUrl}
-                            alt={item.title || "Product item"}
-                            className="v-card-img"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/images/designer_bomber_jacket.jpg";
-                            }}
-                          />
+                          <Link to={`/seller/product/${item._id}`}>
+                            <img
+                              src={imgUrl}
+                              alt={item.title || "Product item"}
+                              className="v-card-img"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "/images/designer_bomber_jacket.jpg";
+                              }}
+                            />
+                          </Link>
                           <div className="v-card-vignette" />
 
                           {/* Image Counter Badge */}
@@ -559,7 +562,7 @@ const Dashboard = () => {
                         <button
                           type="button"
                           className="v-btn-details"
-                          onClick={() => setQuickViewProduct(item)}
+                          onClick={() => navigate(`/seller/product/${item._id}`)}
                         >
                           View Details
                         </button>
@@ -626,15 +629,17 @@ const Dashboard = () => {
                     <tr key={item._id || idx}>
                       <td>
                         <div className="v-dashboard__table-piece">
-                          <img
-                            src={imgUrl}
-                            alt={item.title}
-                            className="v-thumb"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/images/designer_bomber_jacket.jpg";
-                            }}
-                          />
+                          <Link to={`/seller/product/${item._id}`}>
+                            <img
+                              src={imgUrl}
+                              alt={item.title}
+                              className="v-thumb"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "/images/designer_bomber_jacket.jpg";
+                              }}
+                            />
+                          </Link>
                           <div className="v-info">
                             <div className="v-name">{item.title || "Untitled Piece"}</div>
                             <div className="v-id">ID: {(item._id || '').slice(-6) || `00${idx + 1}`}</div>
