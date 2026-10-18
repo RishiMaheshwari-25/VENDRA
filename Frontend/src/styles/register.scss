@@ -1,1263 +1,527 @@
 @use './variables' as *;
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* =========================================================
+   VENDRA — Login & Register
+   Split layout: quiet editorial panel + calm form
+   ========================================================= */
 
 .register-page,
 .login-page {
   display: flex;
-  position: fixed;
-  inset: 0;
-  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  height: 100vh;
-  height: 100dvh;
-  background-color: $bg-black;
-  color: $text-white;
-  font-family: $font-family;
-  overflow: hidden;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (max-width: 1024px) {
-    position: absolute;
-    inset: 0 auto auto 0;
-    flex-direction: column;
-    height: auto;
-    min-height: 100vh;
-    min-height: 100dvh;
-    overflow-y: auto;
-  }
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
 }
 
-/* =========================================================
-   LEFT HERO SIDE (Branded Purple Showcase with 3D Phones)
-   ========================================================= */
+/* ── Left: editorial panel ─────────────────────────────── */
 .hero-side {
-  flex: 1.15;
-  background: radial-gradient(circle at 50% 45%, #4c117e 0%, #300a58 50%, #1a0530 100%);
-  position: relative;
+  position: sticky;
+  top: 0;
+  flex: 1;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 36px 48px;
+  gap: 32px;
+  padding: 44px 64px 56px;
+  background: var(--surface-2);
   overflow: hidden;
   user-select: none;
 
   @media (max-width: 1024px) {
-    display: none; // On small mobile screens focus on form; or display as top banner
+    display: none;
   }
 
-  // Ambient concentric glow rings
-  .ambient-glow-core {
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 360px;
-    height: 360px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(124, 58, 237, 0.25) 45%, transparent 75%);
-    border-radius: 50%;
-    filter: blur(40px);
-    pointer-events: none;
-    z-index: 1;
+  // Decorative layers & busy mock-ups are intentionally hidden
+  .ambient-glow-core,
+  .concentric-ring,
+  .showcase-spotlight,
+  .floating-badge,
+  .phone-back,
+  .phone-notch,
+  .phone-user-bar,
+  .phone-product-card .action-row,
+  .phone-footer-bar,
+  .logo-icon {
+    display: none;
   }
 
-  .concentric-ring {
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    pointer-events: none;
-    z-index: 1;
-
-    &.ring-1 {
-      width: 440px;
-      height: 440px;
-      border-color: rgba(192, 132, 252, 0.15);
-    }
-    &.ring-2 {
-      width: 600px;
-      height: 600px;
-      border-color: rgba(255, 255, 255, 0.06);
-    }
-    &.ring-3 {
-      width: 780px;
-      height: 780px;
-      border-color: rgba(255, 255, 255, 0.03);
-    }
-  }
-
-  // Top Monogram Header
   .hero-header {
-    position: relative;
-    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
 
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+  .logo-text {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    color: var(--ink);
+  }
 
-      .logo-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, $purple-vibrant, #d946ef);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+  .hero-badge {
+    @include eyebrow;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
-        span {
-          font-weight: 800;
-          font-size: 18px;
-          color: #ffffff;
-        }
-      }
-
-      .logo-text {
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        color: #ffffff;
-      }
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 14px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: $radius-pill;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: $purple-light;
-      backdrop-filter: blur(8px);
-
-      .badge-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: #a855f7;
-        box-shadow: 0 0 8px #a855f7;
-        animation: pulseDot 2s infinite;
-      }
+    .badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
     }
   }
 
-  // Center 3D Showcase Area
   .hero-showcase {
-    position: relative;
-    z-index: 4;
+    flex: 1;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 480px;
-    perspective: 1200px;
-
-    // Ambient Spotlight
-    .showcase-spotlight {
-      position: absolute;
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(124, 58, 237, 0.15) 50%, transparent 75%);
-      filter: blur(40px);
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    // Floating Glass Badges
-    .floating-badge {
-      position: absolute;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 16px;
-      background: rgba(14, 14, 20, 0.88);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: $radius-pill;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(168, 85, 247, 0.35);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: #ffffff;
-      transition: transform 0.3s ease;
-
-      &.badge-top {
-        top: 6px;
-        left: 12px;
-        animation: floatBadgeTop 4.5s ease-in-out infinite;
-
-        .badge-icon-verified {
-          color: #22c55e;
-        }
-      }
-
-      &.badge-bottom {
-        bottom: 4px;
-        right: 14px;
-        animation: floatBadgeBottom 5s ease-in-out infinite;
-
-        .badge-icon-trend {
-          color: #a855f7;
-        }
-
-        .badge-col {
-          display: flex;
-          flex-direction: column;
-          line-height: 1.1;
-
-          .badge-micro {
-            font-size: 8px;
-            color: #a1a1aa;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-          }
-
-          .badge-strong {
-            font-size: 11px;
-            font-weight: 800;
-            color: #ffffff;
-          }
-        }
-      }
-    }
-
-    // Left Tilted Phone (Behind - Streetwear & Designer Bomber)
-    .phone-back {
-      position: absolute;
-      width: 250px;
-      height: 440px;
-      background: #0f0f15;
-      border-radius: 36px;
-      border: 4px solid #323242;
-      box-shadow: -22px 28px 65px rgba(0, 0, 0, 0.75), 0 0 35px rgba(124, 58, 237, 0.35);
-      transform: rotateY(18deg) rotateX(12deg) rotateZ(-6deg) translateX(-60px) translateY(-10px);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow: hidden;
-      transition: transform 0.4s ease;
-
-      &:hover {
-        transform: rotateY(16deg) rotateX(10deg) rotateZ(-4deg) translateX(-55px) translateY(-14px);
-      }
-
-      .phone-notch {
-        width: 60px;
-        height: 4px;
-        background: #33333a;
-        border-radius: 10px;
-        margin: 0 auto 2px auto;
-      }
-
-      .phone-mini-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 2px;
-
-        .brand-tag {
-          font-size: 9px;
-          font-weight: 800;
-          color: #d8b4fe;
-          letter-spacing: 0.06em;
-        }
-
-        .live-pill {
-          font-size: 8px;
-          font-weight: 700;
-          color: #22c55e;
-          background: rgba(34, 197, 94, 0.15);
-          border: 1px solid rgba(34, 197, 94, 0.3);
-          border-radius: 10px;
-          padding: 2px 6px;
-        }
-      }
-
-      .phone-product-card {
-        background: #151520;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 18px;
-        overflow: hidden;
-        padding: 6px;
-
-        .image-wrapper {
-          position: relative;
-          width: 100%;
-          height: 200px;
-          border-radius: 14px;
-          overflow: hidden;
-          background: #050507;
-
-          .product-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s ease;
-          }
-
-          .rarity-tag {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            font-size: 7.5px;
-            font-weight: 800;
-            padding: 2px 6px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            color: #ffffff;
-            letter-spacing: 0.04em;
-          }
-        }
-
-        .product-details {
-          padding: 8px 4px 4px 4px;
-
-          .title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .product-title {
-              font-size: 11px;
-              font-weight: 700;
-              color: #ffffff;
-            }
-
-            .product-price {
-              font-size: 12px;
-              font-weight: 800;
-              color: #c084fc;
-            }
-          }
-
-          .meta-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 3px;
-
-            .rating-tag {
-              font-size: 8.5px;
-              color: #a1a1aa;
-            }
-
-            .status-badge {
-              font-size: 8px;
-              font-weight: 600;
-              color: #a855f7;
-              background: rgba(168, 85, 247, 0.15);
-              padding: 1px 6px;
-              border-radius: 6px;
-            }
-          }
-        }
-      }
-
-      .mini-bid-bar {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 12px;
-        padding: 6px 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-
-        .bid-info {
-          display: flex;
-          flex-direction: column;
-
-          .bid-label {
-            font-size: 7.5px;
-            color: #71717a;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-          }
-
-          .bid-val {
-            font-size: 9.5px;
-            font-weight: 700;
-            color: #ffffff;
-          }
-        }
-
-        .view-btn {
-          font-size: 9px;
-          font-weight: 700;
-          padding: 3px 10px;
-          border-radius: 14px;
-          background: linear-gradient(135deg, $purple-primary, $purple-vibrant);
-          color: #ffffff;
-          box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
-        }
-      }
-    }
-
-    // Right Tilted Phone (In Front - Majestic Haute Couture)
-    .phone-front {
-      position: absolute;
-      width: 260px;
-      height: 450px;
-      background: #09090e;
-      border-radius: 36px;
-      border: 4px solid #434358;
-      box-shadow: 20px 30px 75px rgba(0, 0, 0, 0.85), 0 0 50px rgba(168, 85, 247, 0.5);
-      transform: rotateY(-14deg) rotateX(12deg) rotateZ(6deg) translateX(55px) translateY(18px);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 3;
-      transition: transform 0.4s ease;
-
-      &:hover {
-        transform: rotateY(-12deg) rotateX(10deg) rotateZ(4deg) translateX(55px) translateY(12px);
-      }
-
-      .phone-notch {
-        width: 64px;
-        height: 5px;
-        background: #2a2a35;
-        border-radius: 10px;
-        margin: 0 auto;
-      }
-
-      .phone-user-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 4px;
-
-        .user-left {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-
-          .avatar-dot {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, $purple-vibrant, #ec4899);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 800;
-            color: #ffffff;
-          }
-
-          .username {
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            color: #ffffff;
-          }
-        }
-
-        .search-pill {
-          background: rgba(168, 85, 247, 0.15);
-          border: 1px solid rgba(168, 85, 247, 0.3);
-          padding: 3px 8px;
-          border-radius: 20px;
-          font-size: 8.5px;
-          font-weight: 700;
-          color: $purple-light;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-      }
-
-      // Featured Couture Card
-      .phone-product-card.featured {
-        background: #13131c;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        overflow: hidden;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-
-        .featured-img-wrap {
-          position: relative;
-          width: 100%;
-          height: 245px;
-          border-radius: 16px;
-          overflow: hidden;
-          background: #000000;
-
-          .product-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: top center;
-            display: block;
-            transition: transform 0.5s ease;
-          }
-
-          &:hover .product-img {
-            transform: scale(1.04);
-          }
-
-          .overlay-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            font-size: 7.5px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            padding: 3px 8px;
-            background: rgba(124, 58, 237, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
-          }
-
-          .product-price-overlay {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            right: 8px;
-            padding: 6px 10px;
-            background: rgba(9, 9, 14, 0.85);
-            backdrop-filter: blur(14px);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-
-            .price-label {
-              font-size: 8px;
-              font-weight: 700;
-              color: #d8b4fe;
-              text-transform: uppercase;
-              letter-spacing: 0.06em;
-            }
-
-            .price-amount {
-              font-size: 15px;
-              font-weight: 800;
-              color: #ffffff;
-              letter-spacing: -0.01em;
-            }
-          }
-        }
-
-        .action-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0 2px;
-
-          .collector-info {
-            display: flex;
-            flex-direction: column;
-
-            .collector-sub {
-              font-size: 7.5px;
-              font-weight: 700;
-              color: #a1a1aa;
-              letter-spacing: 0.06em;
-              text-transform: uppercase;
-            }
-
-            .collector-time {
-              font-size: 9.5px;
-              font-weight: 700;
-              color: #22c55e;
-            }
-          }
-
-          .btn-acquire {
-            background: linear-gradient(135deg, $purple-primary, $purple-vibrant);
-            color: #ffffff;
-            border: none;
-            border-radius: 20px;
-            padding: 5px 12px;
-            font-size: 9.5px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.5);
-            transition: all 0.2s ease;
-
-            &:hover {
-              transform: translateY(-1px);
-              box-shadow: 0 6px 18px rgba(168, 85, 247, 0.6);
-            }
-          }
-        }
-      }
-
-      .phone-footer-bar {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 12px;
-        padding: 5px 8px;
-        text-align: center;
-
-        .secure-badge {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 5px;
-          font-size: 8px;
-          font-weight: 600;
-          color: #a1a1aa;
-
-          .secure-icon {
-            color: #22c55e;
-          }
-        }
-      }
-    }
-
   }
 
-  // Bottom Tagline
+  .phone-front {
+    width: 100%;
+    max-width: 340px;
+    max-height: 100%;
+  }
+
+  .phone-product-card.featured {
+    .featured-img-wrap {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      max-height: calc(100vh - 380px);
+      min-height: 260px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: var(--r);
+      background: var(--surface);
+
+      .product-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .overlay-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      padding: 6px 10px;
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: var(--r);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+    }
+
+    .product-price-overlay {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 40px 18px 16px;
+      background: linear-gradient(to top, rgba(20, 19, 17, 0.55), transparent);
+      color: #fff;
+
+      .price-label {
+        font-size: 10px;
+        letter-spacing: 0.16em;
+      }
+
+      .price-amount {
+        font-family: var(--font-serif);
+        font-size: 20px;
+      }
+    }
+  }
+
   .hero-footer {
-    position: relative;
-    z-index: 5;
-    text-align: center;
-    max-width: 480px;
-    margin: 0 auto;
+    max-width: 420px;
 
     h2 {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #ffffff;
-      margin: 0 0 8px 0;
+      font-family: var(--font-serif);
+      font-size: 34px;
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--ink);
     }
 
     p {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.75);
-      margin: 0;
-      font-weight: 400;
-      line-height: 1.5;
+      margin-top: 16px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--muted);
     }
   }
 }
 
-/* =========================================================
-   RIGHT FORM SIDE (Deep Obsidian Minimal Registration)
-   ========================================================= */
+/* ── Right: form ───────────────────────────────────────── */
 .form-side {
-  flex: 0.85;
-  background-color: #000000;
+  flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 16px 32px;
-  position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100vh;
-  height: 100dvh;
-  box-sizing: border-box;
-  scrollbar-width: none;
+  justify-content: center;
+  padding: 72px 32px;
+  background: var(--bg);
 
-  &::-webkit-scrollbar {
-    display: none;
+  @media (max-width: 480px) {
+    padding: 48px 20px;
   }
 
-  @media (max-width: 1024px) {
-    flex: 1;
-    padding: 24px 20px;
-    height: auto;
-    overflow-y: visible;
-  }
-
-  // Ambient corner glow
   .corner-glow {
-    position: absolute;
-    top: -80px;
-    right: -80px;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
-    pointer-events: none;
+    display: none;
   }
 
   .form-wrapper {
     width: 100%;
     max-width: 400px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px; // Compact breathing space so entire form fits without vertical clipping
-    margin: auto 0; // Centers when space is ample; starts at top padding when space is tight
-    padding: 8px 0;
-    position: relative;
-    z-index: 2;
+    animation: vRise 0.5s ease;
   }
+}
 
-  // Header Title
-  .form-header {
-    text-align: left;
+.form-header {
+  margin-bottom: 40px;
 
-    .brand-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: $purple-light;
-      margin-bottom: 3px;
-    }
-
-    h1 {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      color: #ffffff;
-      margin: 0;
-      line-height: 1.15;
-    }
-
-    p {
-      font-size: 12px;
-      color: $text-muted;
-      margin: 3px 0 0 0;
-      line-height: 1.35;
-    }
-  }
-
-  // Alerts
-  .alert-box {
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 12px;
+  .brand-eyebrow {
+    @include eyebrow;
     display: flex;
     align-items: center;
-    gap: 8px;
+    margin-bottom: 18px;
 
-    &.alert-error {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #f87171;
-    }
-
-    &.alert-success {
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #4ade80;
+    svg {
+      display: none;
     }
   }
 
-  // Form body
-  .register-form,
-  .login-form {
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+
+  p {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+}
+
+/* Alerts */
+.alert-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  padding: 14px 16px;
+  border-left: 2px solid currentColor;
+  border-radius: var(--r);
+  font-size: 13px;
+
+  &.alert-error {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  &.alert-success {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+}
+
+/* Form */
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  label {
+    @include eyebrow;
+  }
+}
+
+.pill-input-container {
+  position: relative;
+
+  .input-icon-left {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
-    flex-direction: column;
-    gap: 9px; // Compact, fits comfortably on standard viewports
+    color: var(--muted);
+    pointer-events: none;
   }
 
-  // Pill Input Group
-  .input-field {
+  input {
+    @include field;
+    padding-left: 44px;
+  }
+
+  .icon-btn-right {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
     display: flex;
-    flex-direction: column;
-    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--muted);
+    transition: color 0.2s ease;
 
-    label {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #e4e4e7;
-      margin-left: 12px;
-      letter-spacing: 0.01em;
-    }
-
-    .pill-input-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-      background: rgba(18, 18, 23, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: $radius-pill;
-      height: 38px; // Streamlined height to prevent any clipping
-      padding: 0 14px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-
-      &:hover {
-        border-color: rgba(255, 255, 255, 0.22);
-      }
-
-      &:focus-within {
-        border-color: $purple-neon;
-        background: rgba(22, 22, 30, 0.95);
-        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2), 0 0 14px rgba(168, 85, 247, 0.25);
-      }
-
-      .input-icon-left {
-        color: #71717a;
-        margin-right: 10px;
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
-        transition: color 0.2s ease;
-      }
-
-      &:focus-within .input-icon-left {
-        color: $purple-vibrant;
-      }
-
-      input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
-        color: #ffffff;
-        font-family: inherit;
-        font-size: 13px;
-        letter-spacing: 0.01em;
-
-        &::placeholder {
-          color: #52525b;
-          font-size: 13px;
-        }
-
-        // Remove edge password reveal in Edge
-        &::-ms-reveal,
-        &::-ms-clear {
-          display: none;
-        }
-      }
-
-      .icon-btn-right {
-        background: transparent;
-        border: none;
-        color: #71717a;
-        cursor: pointer;
-        padding: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: color 0.2s;
-
-        &:hover {
-          color: #ffffff;
-        }
-      }
+    &:hover {
+      color: var(--ink);
     }
   }
+}
 
-  // isSeller Checkbox Tile
-  .seller-checkbox-container {
+/* Shared custom checkbox */
+.custom-checkbox-box {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+  background: var(--surface);
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  .check-icon {
+    color: var(--bg);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+}
+
+.form-auxiliary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  .remember-me {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 6px 12px;
-    background: rgba(18, 18, 23, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
     cursor: pointer;
-    transition: all 0.2s ease;
     user-select: none;
-    margin-top: 1px;
-
-    &:hover {
-      border-color: rgba(168, 85, 247, 0.4);
-      background: rgba(24, 24, 32, 0.8);
-    }
 
     input[type='checkbox'] {
       display: none;
     }
 
-    .custom-checkbox-box {
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      background: #09090b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: all 0.2s ease;
-
-      .check-icon {
-        color: #ffffff;
-        opacity: 0;
-        transform: scale(0.6);
-        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
+    .remember-label {
+      font-size: 13px;
+      color: var(--ink-soft);
     }
 
     &.checked .custom-checkbox-box {
-      background: linear-gradient(135deg, $purple-primary, $purple-neon);
-      border-color: $purple-light;
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+      background: var(--ink);
+      border-color: var(--ink);
 
       .check-icon {
         opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .checkbox-labels {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-
-      .label-title {
-        font-size: 12px;
-        font-weight: 700;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        .seller-badge {
-          font-size: 8.5px;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          padding: 1.5px 5px;
-          background: rgba(168, 85, 247, 0.2);
-          border: 1px solid rgba(168, 85, 247, 0.3);
-          border-radius: 8px;
-          color: $purple-light;
-        }
-      }
-
-      .label-desc {
-        font-size: 10px;
-        color: $text-muted;
       }
     }
   }
 
-  // Primary Gradient Button
-  .btn-submit {
-    height: 40px;
-    border-radius: $radius-pill;
-    background: $gradient-btn-primary;
-    border: none;
-    color: #ffffff;
-    font-size: 13.5px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.45), 0 0 10px rgba(168, 85, 247, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 2px;
-    transition: all 0.25s ease;
-
-    &:hover:not(:disabled) {
-      background: $gradient-btn-hover;
-      box-shadow: 0 6px 26px rgba(139, 92, 246, 0.65), 0 0 16px rgba(192, 132, 252, 0.5);
-      transform: translateY(-1px);
-    }
-
-    &:active:not(:disabled) {
-      transform: scale(0.99);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #ffffff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-  }
-
-  // Sign In redirect text
-  .redirect-text {
-    text-align: center;
-    font-size: 11.5px;
-    color: $text-muted;
-    margin: 0;
-
-    .signin-link {
-      color: $purple-neon;
-      font-weight: 700;
-      text-decoration: none;
-      margin-left: 4px;
-      transition: color 0.2s;
-
-      &:hover {
-        color: #ffffff;
-        text-decoration: underline;
-      }
-    }
-  }
-
-  // Divider line
-  .auth-divider {
-    position: relative;
-    text-align: center;
-    margin: 0;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    span {
-      position: relative;
-      background: #000000;
-      padding: 0 12px;
-      font-size: 11px;
-      color: #71717a;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-  }
-
-  // Auxiliary Controls (Remember Me & Forgot Password)
-  .form-auxiliary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2px 4px;
-    margin-top: 2px;
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
-
-      input[type='checkbox'] {
-        display: none;
-      }
-
-      .custom-checkbox-box {
-        width: 18px;
-        height: 18px;
-        border-radius: 5px;
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        background: #09090b;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-
-        .check-icon {
-          color: #ffffff;
-          opacity: 0;
-          transform: scale(0.6);
-          transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-      }
-
-      &.checked .custom-checkbox-box {
-        background: linear-gradient(135deg, $purple-primary, $purple-neon);
-        border-color: $purple-light;
-        box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-
-        .check-icon {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-
-      .remember-label {
-        font-size: 12px;
-        color: $text-muted;
-        transition: color 0.2s;
-      }
-
-      &:hover .remember-label {
-        color: #ffffff;
-      }
-    }
-
-    .forgot-link {
-      font-size: 12px;
-      color: $purple-light;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.2s;
-
-      &:hover {
-        color: #ffffff;
-        text-decoration: underline;
-      }
-    }
-  }
-
-  // Social Auth Grid (Google & Apple)
-  .social-auth-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    width: 100%;
-
-    @media (max-width: 420px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  // Google Continue Button
-  .btn-google,
-  .btn-apple {
-    position: relative;
-    height: 38px;
-    border-radius: $radius-pill;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #ffffff;
-    font-size: 12.5px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-
-    svg {
-      width: 15px;
-      height: 15px;
-    }
+  .forgot-link {
+    font-size: 13px;
+    color: var(--muted);
+    transition: color 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(168, 85, 247, 0.5);
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+      color: var(--ink);
     }
   }
+}
 
-  @media (max-height: 720px) {
-    padding: 10px 24px;
+.seller-checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s ease;
 
-    .form-wrapper {
-      gap: 7px;
-      padding: 4px 0;
-    }
-
-    .form-header {
-      h1 {
-        font-size: 21px;
-      }
-      p {
-        font-size: 11.5px;
-      }
-    }
-
-    .register-form,
-    .login-form {
-      gap: 7px;
-    }
-
-    .pill-input-container {
-      height: 36px;
-    }
-
-    .btn-submit {
-      height: 36px;
-    }
-
-    .btn-google,
-    .btn-apple {
-      height: 36px;
-    }
+  &:hover {
+    border-color: var(--line-strong);
   }
 
-  // Legal Microcopy
-  .footer-microcopy {
-    text-align: center;
-    font-size: 11px;
-    color: #52525b;
-    line-height: 1.5;
-    margin-top: 4px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  input[type='checkbox'] {
+    display: none;
+  }
 
-    a {
-      color: $text-muted;
-      text-decoration: none;
-      transition: color 0.2s;
+  .custom-checkbox-box {
+    margin-top: 2px;
+  }
 
-      &:hover {
-        color: $purple-light;
-        text-decoration: underline;
+  &.checked {
+    border-color: var(--ink);
+
+    .custom-checkbox-box {
+      background: var(--ink);
+      border-color: var(--ink);
+
+      .check-icon {
+        opacity: 1;
       }
     }
   }
+
+  .checkbox-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .label-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .seller-badge {
+    padding: 2px 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: var(--r);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .label-desc {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
 }
 
-// Animations
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.btn-submit {
+  @include btn-solid;
+  width: 100%;
+  height: 52px;
+  margin-top: 8px;
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: vSpin 0.7s linear infinite;
   }
 }
 
-@keyframes pulseDot {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(0.85);
+.redirect-text {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+
+  .signin-link {
+    margin-left: 8px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.65;
+    }
   }
 }
 
-@keyframes floatBadgeTop {
-  0%, 100% {
-    transform: translateY(0);
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 32px 0 24px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
   }
-  50% {
-    transform: translateY(-6px);
+
+  span {
+    @include eyebrow;
+    font-size: 10px;
   }
 }
 
-@keyframes floatBadgeBottom {
-  0%, 100% {
-    transform: translateY(0);
+.social-auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-google,
+.btn-apple {
+  @include btn-outline;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  letter-spacing: 0.1em;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
   }
-  50% {
-    transform: translateY(6px);
+}
+
+.footer-microcopy {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+
+  a {
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--line-strong);
+
+    &:hover {
+      color: var(--ink);
+    }
   }
 }

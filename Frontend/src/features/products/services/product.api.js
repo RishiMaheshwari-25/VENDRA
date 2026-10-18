@@ -19,4 +19,11 @@ export async function getSellerProduct(sellerId){
         console.log("Error in getting seller product",error)
     }
 }
-
+export async function getAllProducts(){
+    const response=await api.get("/");
+    return response.data;
+}
+export async function getProductDetails(productId){
+    const response=await api.get(`/${productId}`)
+    return response.data;
+}
