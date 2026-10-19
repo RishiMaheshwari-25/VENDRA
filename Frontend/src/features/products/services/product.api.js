@@ -27,3 +27,19 @@ export async function getProductDetails(productId){
     const response=await api.get(`/${productId}`)
     return response.data;
 }
+export async function createProductVariant(productId,newProductVariant){
+
+    const formData=new FormData();
+    formData.append("title",newProductVariant.title)
+    formData.append("description",newProductVariant.description)
+    newProductVariant.images.forEach((image)=>{
+        formData.append("images",image)
+    })
+
+    formData.append("stock",newProductVariant.stock)
+    formData.append("priceAmount",newProductVariant.price.amount)
+    formData.append("priceCurrency",newProductVariant.price.currency)
+    formData.append("attributes",JSON.stringify(newProductVariant.attributes))
+    const response=await api.post(`/${productId}/variant`,formData)
+    return response.data
+}
