@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useProduct } from '../hooks/useProduct';
 import '../../../styles/product-details.scss';
+import { useCart } from '../../cart/hooks/useCart';
 
 const getAttributeEntries = (attributes) => {
   if (!attributes) return [];
@@ -33,7 +34,7 @@ const ProductDetails = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { handleGetProductDetail } = useProduct();
-
+const {handleAddItems}=useCart();
   useEffect(() => {
     let isCurrentProduct = true;
 
@@ -179,6 +180,21 @@ const ProductDetails = () => {
     setTimeout(() => {
       setToastMsg('');
     }, 2800);
+  };
+
+  const handleAddToBag = async () => {
+    if (!selectedVariant?._id) {
+      triggerToast('Please select a product variant before adding to your bag');
+      return;
+    }
+
+    try {
+      await handleAddItems(product._id || productId, selectedVariant._id);
+      triggerToast(`Added "${product.title}" to your archival bag`);
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      triggerToast(error.response?.data?.message || 'Unable to add item to bag. Please try again.');
+    }
   };
 
   const baseAmount = Number(displayedPrice?.amount) || 0;
@@ -498,7 +514,7 @@ const ProductDetails = () => {
                 <button
                   type="button"
                   className="v-pd__btn v-pd__btn--solid"
-                  onClick={() => triggerToast(`Added "${product.title}" to your archival bag`)}
+                  onClick={handleAddToBag}
                 >
                   <ShoppingBag size={16} />
                   <span>Add to Bag</span>

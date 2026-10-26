@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { useProduct } from '../hooks/useProduct';
+import { useCart } from '../../cart/hooks/useCart';
 import { useNavigate } from 'react-router';
 import {
   Search,
@@ -72,6 +73,7 @@ const CURRENCY_RATES = {
 
 const Home = () => {
   const { handleGetAllProducts } = useProduct();
+  const { handleAddItems } = useCart();
   const rawProducts = useSelector((state) => state.product?.products);
   const currentUser = useSelector((state) => state.auth?.user);
   const navigate=useNavigate();
@@ -207,6 +209,22 @@ const Home = () => {
     setTimeout(() => {
       setToastMessage('');
     }, 2800);
+  };
+
+  const handleAddProductToBag = async (item) => {
+    const variantId = item.variants?.[0]?._id;
+    if (!item._id || !variantId) {
+      triggerToast('This product has no available variant to add to your bag');
+      return;
+    }
+
+    try {
+      await handleAddItems(item._id, variantId);
+      triggerToast(`Added "${item.title}" to your archival bag`);
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      triggerToast(error.response?.data?.message || 'Unable to add item to bag. Please try again.');
+    }
   };
 
   // Favorite toggle handler
@@ -578,6 +596,7 @@ const Home = () => {
                     <button
                       type="button"
                       className="v-btn-addbag"
+                      onClick={() => handleAddProductToBag(item)}
                     >
                       <ShoppingBag size={15} />
                       <span>Add to Bag</span>
@@ -733,6 +752,7 @@ const Home = () => {
                   type="button"
                   className="v-home__hero__btn-explore"
                   style={{ flex: 1, justifyContent: 'center' }}
+                  onClick={() => handleAddProductToBag(quickViewProduct)}
                 >
                   <ShoppingBag size={15} />
                   <span>Acquire Piece / Add to Bag</span>
