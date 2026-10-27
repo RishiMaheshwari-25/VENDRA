@@ -9,3 +9,7 @@ export async function addItems(productId,variantId){
   })
   return response.data;
 }
+export async function getItems(){
+  const response=await api.get("/");
+  return response.data; 
+}

@@ -73,10 +73,11 @@ const CURRENCY_RATES = {
 
 const Home = () => {
   const { handleGetAllProducts } = useProduct();
-  const { handleAddItems } = useCart();
+  const { handleAddItems, handleGetItems } = useCart();
   const rawProducts = useSelector((state) => state.product?.products);
   const currentUser = useSelector((state) => state.auth?.user);
-  const navigate=useNavigate();
+  const cartItems = useSelector((state) => state.cart?.items);
+  const navigate = useNavigate();
 
   // Local state for UI controls
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,12 +87,18 @@ const Home = () => {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [selectedModalImg, setSelectedModalImg] = useState(0);
   const [toastMessage, setToastMessage] = useState('');
-  const [bagCount, setBagCount] = useState(0);
   const [favorites, setFavorites] = useState({});
 
-  // Fetch all products from API on mount
+  // Compute live bag count from cartItems
+  const bagCount = useMemo(() => {
+    if (!Array.isArray(cartItems)) return 0;
+    return cartItems.reduce((acc, item) => acc + (Number(item?.quantity) || 1), 0);
+  }, [cartItems]);
+
+  // Fetch all products & cart items from API on mount
   useEffect(() => {
     handleGetAllProducts();
+    handleGetItems();
   }, []);
 
   // Safe list of products: uses backend products if available, otherwise sample products
@@ -220,6 +227,7 @@ const Home = () => {
 
     try {
       await handleAddItems(item._id, variantId);
+      await handleGetItems();
       triggerToast(`Added "${item.title}" to your archival bag`);
     } catch (error) {
       console.error('Failed to add item to cart:', error);
@@ -321,7 +329,7 @@ const Home = () => {
             type="button"
             className="v-home__icon-btn"
             title="Archival Bag"
-            onClick={() => triggerToast(`Archival Bag contains ${bagCount} piece(s)`)}
+            onClick={() => navigate('/cart')}
           >
             <ShoppingBag size={20} />
             {bagCount > 0 && <span className="v-badge-count">{bagCount}</span>}

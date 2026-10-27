@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router';
 import {
   ArrowLeft,
@@ -34,7 +35,14 @@ const ProductDetails = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { handleGetProductDetail } = useProduct();
-const {handleAddItems}=useCart();
+  const { handleAddItems, handleGetItems } = useCart();
+  const cartItems = useSelector((state) => state.cart?.items);
+  const bagCount = (cartItems || []).reduce((acc, item) => acc + (Number(item?.quantity) || 1), 0);
+
+  useEffect(() => {
+    handleGetItems();
+  }, []);
+
   useEffect(() => {
     let isCurrentProduct = true;
 
@@ -190,6 +198,7 @@ const {handleAddItems}=useCart();
 
     try {
       await handleAddItems(product._id || productId, selectedVariant._id);
+      await handleGetItems();
       triggerToast(`Added "${product.title}" to your archival bag`);
     } catch (error) {
       console.error('Failed to add item to cart:', error);
@@ -207,10 +216,16 @@ const {handleAddItems}=useCart();
     <div className="v-pd">
       <header className="v-pd__header">
         <Link to="/" className="v-pd__brand">VENDRA</Link>
-        <Link to="/" className="v-pd__back">
-          <ArrowLeft size={14} />
-          <span>Back to catalog</span>
-        </Link>
+        <div className="v-pd__header-actions">
+          <Link to="/" className="v-pd__back">
+            <ArrowLeft size={14} />
+            <span>Back to catalog</span>
+          </Link>
+          <Link to="/cart" className="v-pd__bag-btn" title="Archival Bag">
+            <ShoppingBag size={18} />
+            {bagCount > 0 && <span className="v-badge-count">{bagCount}</span>}
+          </Link>
+        </div>
       </header>
 
       <main className="v-pd__main">
