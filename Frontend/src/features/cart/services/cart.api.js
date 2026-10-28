@@ -13,3 +13,7 @@ export async function getItems(){
   const response=await api.get("/");
   return response.data; 
 }
+export async function incrementCartItem({productId,variantId}){
+  const response=await api.patch(`/quantity/increment/${productId}/${variantId}`)
+  return response.data;
+}

@@ -53,7 +53,7 @@ const formatPrice = (amount, currency = 'INR') => {
 const Cart = () => {
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
-  const { handleGetItems, handleAddItems } = useCart();
+  const { handleGetItems, handleCartItemsQantity } = useCart();
 
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
@@ -149,7 +149,7 @@ const Cart = () => {
 
     try {
       setUpdatingItemId(productId);
-      await handleAddItems(productId, variantId);
+      await handleCartItemsQantity({ productId, variantId });
       await handleGetItems();
       triggerToast(`Increased quantity of "${item?.product?.title || 'item'}"`);
     } catch (error) {
