@@ -53,7 +53,7 @@ const formatPrice = (amount, currency = 'INR') => {
 const Cart = () => {
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
-  const { handleGetItems, handleCartItemsQantity } = useCart();
+  const { handleGetItems, handleCartItemsQantity,handleCartItemsDecrement } = useCart();
 
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
@@ -160,8 +160,34 @@ const Cart = () => {
     }
   };
 
-  const handleDecreaseQty = (item) => {
-    triggerToast(`Minimum quantity reached for "${item?.product?.title || 'item'}".`);
+  const handleDecreaseQty = async (item) => {
+    const productId = item?.product?._id || item?._id;
+    const variantId =
+      item?.variant?._id ||
+      (typeof item?.variant === 'string' ? item.variant : null) ||
+      item?.product?.variants?.[0]?._id;
+
+    if (!productId || !variantId) {
+      triggerToast('Unable to identify variant for quantity update.');
+      return;
+    }
+
+    if ((Number(item?.quantity) || 1) <= 1) {
+      triggerToast(`Minimum quantity reached for "${item?.product?.title || 'item'}".`);
+      return;
+    }
+
+    try {
+      setUpdatingItemId(productId);
+      await handleCartItemsDecrement({ productId, variantId });
+      await handleGetItems();
+      triggerToast(`Decreased quantity of "${item?.product?.title || 'item'}"`);
+    } catch (error) {
+      console.error('Error decreasing quantity:', error);
+      triggerToast(error.response?.data?.message || 'Unable to update quantity.');
+    } finally {
+      setUpdatingItemId(null);
+    }
   };
 
   const handleRemoveItem = (item) => {
