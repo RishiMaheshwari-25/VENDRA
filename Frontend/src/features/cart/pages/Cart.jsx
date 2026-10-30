@@ -50,6 +50,31 @@ const formatPrice = (amount, currency = 'INR') => {
   return `${symbol}${Number(amount || 0).toLocaleString(currency === 'INR' ? 'en-IN' : undefined)}`;
 };
 
+const getCurrentPriceDetails = (item) => {
+  const product = item?.product;
+  const variantId =
+    item?.variant?._id ||
+    (typeof item?.variant === 'string' ? item.variant : null);
+  const selectedVariant = Array.isArray(product?.variants)
+    ? product.variants.find(
+        (variant) => variantId && String(variant?._id) === String(variantId)
+      )
+    : null;
+  const variantPrice = item?.variant?.price || selectedVariant?.price;
+  const price = variantPrice || product?.price;
+
+  if (
+    price &&
+    price.amount !== undefined &&
+    price.amount !== null &&
+    Number.isFinite(Number(price.amount))
+  ) {
+    return { price, isVariantPrice: Boolean(variantPrice) };
+  }
+
+  return null;
+};
+
 const Cart = () => {
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
@@ -99,14 +124,19 @@ const Cart = () => {
 
   const rawSubtotal = useMemo(() => {
     return items.reduce((acc, item) => {
-      const price = Number(item?.price?.amount ?? item?.product?.price?.amount ?? 0);
+      const currentPrice = getCurrentPriceDetails(item)?.price;
+      const price = Number(currentPrice?.amount ?? item?.price?.amount ?? 0);
       const qty = Number(item?.quantity) || 1;
       return acc + price * qty;
     }, 0);
   }, [items]);
 
   const primaryCurrency = useMemo(() => {
-    return items[0]?.price?.currency || items[0]?.product?.price?.currency || 'INR';
+    return (
+      getCurrentPriceDetails(items[0])?.price?.currency ||
+      items[0]?.price?.currency ||
+      'INR'
+    );
   }, [items]);
 
   const discountAmount = promoApplied ? Math.round(rawSubtotal * 0.1) : 0;
@@ -290,8 +320,19 @@ const Cart = () => {
             <section className="v-cart__items-col">
               {items.map((item, idx) => {
                 const product = item?.product || {};
-                const unitPrice = item?.price?.amount ?? product?.price?.amount ?? 0;
-                const currency = item?.price?.currency || product?.price?.currency || 'INR';
+                const currentPriceDetails = getCurrentPriceDetails(item);
+                const currentPrice = currentPriceDetails?.price;
+                const unitPrice = Number(currentPrice?.amount ?? item?.price?.amount ?? 0);
+                const currency =
+                  currentPrice?.currency || item?.price?.currency || 'INR';
+                const originalUnitPrice = Number(item?.price?.amount);
+                const canComparePrice =
+                  currentPriceDetails !== null &&
+                  !currentPriceDetails.isVariantPrice &&
+                  Number.isFinite(originalUnitPrice) &&
+                  Number.isFinite(unitPrice) &&
+                  (item?.price?.currency || currency) === currency;
+                const priceDifference = canComparePrice ? unitPrice - originalUnitPrice : 0;
                 const quantity = Number(item?.quantity) || 1;
                 const subtotal = unitPrice * quantity;
                 const imageSrc = getProductImage(item);
@@ -391,9 +432,36 @@ const Cart = () => {
                           </div>
 
                           <div className="v-cart__unit-price">
+                            {canComparePrice && priceDifference !== 0 && (
+                              <del>{formatPrice(originalUnitPrice, currency)}</del>
+                            )}
                             <strong>{formatPrice(unitPrice, currency)}</strong>
                           </div>
                         </div>
+
+                        {canComparePrice && (
+                          <p
+                            className={`v-cart__price-change ${
+                              priceDifference < 0
+                                ? 'is-decreased'
+                                : priceDifference > 0
+                                  ? 'is-increased'
+                                  : 'is-unchanged'
+                            }`}
+                          >
+                            {priceDifference < 0
+                              ? `Price decreased. You save ${formatPrice(
+                                  Math.abs(priceDifference) * quantity,
+                                  currency
+                                )} total; now ${formatPrice(unitPrice, currency)} per item.`
+                              : priceDifference > 0
+                                ? `Price increased by ${formatPrice(
+                                    priceDifference,
+                                    currency
+                                  )} per item; now ${formatPrice(unitPrice, currency)}.`
+                                : 'Price is unchanged since you added it to your cart.'}
+                          </p>
+                        )}
 
                         {/* Subtotal & Action Buttons */}
                         <div className="v-cart__subtotal-actions">

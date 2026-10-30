@@ -370,12 +370,39 @@
   }
 
   &__unit-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
     font-size: 13px;
     color: var(--muted);
+
+    del {
+      color: var(--muted);
+      font-size: 12px;
+    }
 
     strong {
       color: var(--ink);
       font-weight: 600;
+    }
+  }
+
+  &__price-change {
+    flex: 1 1 100%;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+
+    &.is-decreased {
+      color: var(--success);
+    }
+
+    &.is-increased {
+      color: var(--danger);
+    }
+
+    &.is-unchanged {
+      color: var(--muted);
     }
   }
 
