@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { useCart } from '../hooks/useCart';
 import {
   ShoppingBag,
@@ -12,8 +12,7 @@ import {
   Truck,
   RotateCcw,
   Heart,
-  Trash2,
-  Check
+  Trash2
 } from 'lucide-react';
 import '../../../styles/cart.scss';
 
@@ -46,8 +45,11 @@ const formatDescription = (desc) => {
 };
 
 const formatPrice = (amount, currency = 'INR') => {
-  const symbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : `${currency} `;
-  return `${symbol}${Number(amount || 0).toLocaleString(currency === 'INR' ? 'en-IN' : undefined)}`;
+  const currencyCode = Array.isArray(currency) ? currency[0] : currency;
+  const resolvedCurrency = currencyCode || 'INR';
+  const symbol =
+    resolvedCurrency === 'INR' ? '₹' : resolvedCurrency === 'USD' ? '$' : `${resolvedCurrency} `;
+  return `${symbol}${Number(amount || 0).toLocaleString(resolvedCurrency === 'INR' ? 'en-IN' : undefined)}`;
 };
 
 const getCurrentPriceDetails = (item) => {
@@ -75,9 +77,19 @@ const getCurrentPriceDetails = (item) => {
   return null;
 };
 
+const getCartItemId = (item) => {
+  const productId = item?.product?._id || item?._id;
+  const variantId =
+    item?.variant?._id ||
+    (typeof item?.variant === 'string' ? item.variant : null) ||
+    item?.product?.variants?.[0]?._id;
+  return `${productId || 'item'}-${variantId || 'variant'}`;
+};
+
 const Cart = () => {
-  const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
+  const rawSubtotal = useSelector((state) => state.cart.totalPrice);
+  const primaryCurrency = useSelector((state) => state.cart.currency);
   const { handleGetItems, handleCartItemsQantity,handleCartItemsDecrement } = useCart();
 
   const [loading, setLoading] = useState(true);
@@ -86,9 +98,6 @@ const Cart = () => {
   const [promoApplied, setPromoApplied] = useState(false);
   const [wishlistItems, setWishlistItems] = useState({});
   const [updatingItemId, setUpdatingItemId] = useState(null);
-
-  // Debug log requested by user
-  console.log('Cart Items in Cart Page:', cartItems);
 
   useEffect(() => {
     let isMounted = true;
@@ -105,7 +114,7 @@ const Cart = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [handleGetItems]);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -120,23 +129,6 @@ const Cart = () => {
 
   const totalItemsCount = useMemo(() => {
     return items.reduce((acc, item) => acc + (Number(item?.quantity) || 1), 0);
-  }, [items]);
-
-  const rawSubtotal = useMemo(() => {
-    return items.reduce((acc, item) => {
-      const currentPrice = getCurrentPriceDetails(item)?.price;
-      const price = Number(currentPrice?.amount ?? item?.price?.amount ?? 0);
-      const qty = Number(item?.quantity) || 1;
-      return acc + price * qty;
-    }, 0);
-  }, [items]);
-
-  const primaryCurrency = useMemo(() => {
-    return (
-      getCurrentPriceDetails(items[0])?.price?.currency ||
-      items[0]?.price?.currency ||
-      'INR'
-    );
   }, [items]);
 
   const discountAmount = promoApplied ? Math.round(rawSubtotal * 0.1) : 0;
@@ -178,7 +170,7 @@ const Cart = () => {
     }
 
     try {
-      setUpdatingItemId(productId);
+      setUpdatingItemId(getCartItemId(item));
       await handleCartItemsQantity({ productId, variantId });
       await handleGetItems();
       triggerToast(`Increased quantity of "${item?.product?.title || 'item'}"`);
@@ -208,7 +200,7 @@ const Cart = () => {
     }
 
     try {
-      setUpdatingItemId(productId);
+      setUpdatingItemId(getCartItemId(item));
       await handleCartItemsDecrement({ productId, variantId });
       await handleGetItems();
       triggerToast(`Decreased quantity of "${item?.product?.title || 'item'}"`);
@@ -334,9 +326,8 @@ const Cart = () => {
                   (item?.price?.currency || currency) === currency;
                 const priceDifference = canComparePrice ? unitPrice - originalUnitPrice : 0;
                 const quantity = Number(item?.quantity) || 1;
-                const subtotal = unitPrice * quantity;
                 const imageSrc = getProductImage(item);
-                const isUpdating = updatingItemId === (product?._id || item?._id);
+                const isUpdating = updatingItemId === getCartItemId(item);
                 const isWishlisted = !!wishlistItems[product?._id || idx];
 
                 // Extract variant attributes if available
@@ -346,7 +337,7 @@ const Cart = () => {
                 const descriptionText = formatDescription(product?.description);
 
                 return (
-                  <article key={product?._id || idx} className="v-cart__item-card">
+                  <article key={getCartItemId(item)} className="v-cart__item-card">
                     {/* 3:4 Aspect Portrait Media */}
                     <div className="v-cart__item-media">
                       <img
@@ -463,15 +454,8 @@ const Cart = () => {
                           </p>
                         )}
 
-                        {/* Subtotal & Action Buttons */}
+                        {/* Item Actions */}
                         <div className="v-cart__subtotal-actions">
-                          <div className="v-cart__item-subtotal">
-                            <span className="v-cart__subtotal-lbl">Subtotal</span>
-                            <span className="v-cart__subtotal-val">
-                              {formatPrice(subtotal, currency)}
-                            </span>
-                          </div>
-
                           <div className="v-cart__item-actions">
                             <button
                               type="button"
