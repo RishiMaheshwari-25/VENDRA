@@ -229,9 +229,8 @@
   overflow: hidden;
   margin-top: 8px;
   padding: 14px 0;
-  background: var(--volt);
-  color: #0d0d0d;
-  border-block: 1px solid #0d0d0d;
+  background: #0d0d0d;
+  color: #f6efdc;
 
   &__track {
     display: flex;
@@ -262,7 +261,7 @@
       width: 5px;
       height: 5px;
       border-radius: 50%;
-      background: #0d0d0d;
+      background: #c9a95c;
     }
   }
 }
