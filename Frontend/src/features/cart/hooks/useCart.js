@@ -1,4 +1,4 @@
-import { addItems, decrementCartItem, getItems, incrementCartItem } from "../services/cart.api";
+import { addItems, createCartOrder, decrementCartItem, getItems, getOrderById, incrementCartItem, verifyCartOrder } from "../services/cart.api";
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { setCartData } from "../state/cart.slice";
@@ -24,10 +24,25 @@ export const useCart=()=>{
 
         return await decrementCartItem({productId,variantId});
      }
+     const handleCreateCartOrder=async()=>{
+      const data=await createCartOrder();
+      return data.order;
+     }
+     const handleVerifyCartOrder=async({razorpay_order_id,razorpay_payment_id,razorpay_signature})=>{
+      const data=await verifyCartOrder({razorpay_order_id,razorpay_payment_id,razorpay_signature});
+      return data.success
+     }
+     const handleGetOrder=useCallback(async(orderId)=>{
+      const data=await getOrderById(orderId);
+      return data.order;
+     },[]);
      return {
+        handleGetOrder,
         handleAddItems,
         handleGetItems,
         handleCartItemsQantity,
-        handleCartItemsDecrement
+        handleCartItemsDecrement,
+        handleCreateCartOrder,
+        handleVerifyCartOrder
      }
 }

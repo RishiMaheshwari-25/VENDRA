@@ -2,7 +2,11 @@ import { stockOfVariant } from "../dao/product.dao.js";
 import cartModel from "../models/cart.model.js";
 import productModel from "../models/product.model.js";
 import mongoose from "mongoose"
-
+import { createOrder } from "../services/payment.service.js";
+import { getCartDetails } from "../dao/cart.dao.js";
+import paymentModel from "../models/payment.model.js";
+import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.js";
+import { config } from "../config/config.js";
 export async function addToCart(req,res){
     const {productId,variantId}=req.params;
     const {quantity=1}=req.body;
@@ -58,65 +62,10 @@ export async function addToCart(req,res){
    })
 
 }
+
 export async function getCart(req,res){
     const user=req.user;
-    let cart=(await cartModel.aggregate(
-        
-  [
-    {
-      $match: {
-        user: new mongoose.Types.ObjectId(user._id)
-      }
-    },
-    { $unwind: { path: '$items' } },
-    {
-      $lookup: {
-        from: 'products',
-        localField: 'items.product',
-        foreignField: '_id',
-        as: 'items.product'
-      }
-    },
-    { $unwind: { path: '$items.product' } },
-    {
-      $unwind: { path: '$items.product.variants' }
-    },
-    {
-      $match: {
-        $expr: {
-          $eq: [
-            '$items.variant',
-            '$items.product.variants._id'
-          ]
-        }
-      }
-    },
-    {
-      $addFields: {
-        itemPrice: {
-          price: {
-            $multiply: [
-              '$items.quantity',
-              '$items.product.variants.price.amount'
-            ]
-          },
-          currency: [
-            '$items.product.variants.price.currency'
-          ]
-        }
-      }
-    },
-    {
-      $group: {
-        _id: '_id',
-        totalPrice: { $sum: '$itemPrice.price' },
-        currency: {
-          $first: '$itemPrice.currency'
-        },
-        items: { $push: '$items' }
-      }
-    }
-  ]))[ 0 ];
+    let cart=await getCartDetails(user._id)
     
     if(!cart){
         await cartModel.create({
@@ -234,5 +183,87 @@ export async function decrementItemsByOne(req, res) {
         success: true
     });
 }
+export async function createOrderCart(req,res){
+    const cart=await getCartDetails(req.user._id);
+    if(!cart){
+    return res.status(401).json({
+        message:"Cart is Empty",
+        success:false
+    })
+    }
+    const order=await createOrder({amount:cart.totalPrice,currency:cart.currency});
+    const payment=await paymentModel.create({
+        user:req.user._id,
+        razorpay:{
+       orderId:order.id
+        },
+        price:{
+     amount:cart.totalPrice,
+       currency:cart.currency
+        },
+        orderItems: cart.items.map(item => ({
+            title: item.product.title,
+            productId: item.product._id,
+            variantId: item.variant,
+            quantity: item.quantity,
+            images: item.product.variants.images || item.product.images,
+            description: item.product.description,
+            price: {
+                amount: item.product.variants.price.amount || item.product.price.amount,
+                currency: item.product.variants.price.currency || item.product.price.currency
+            }
+        }))
+    })
+    return res.status(201).json({
+        message:"Order Placed Successfully",
+        success:true,
+        order
+    })
+}
+export const verifyOrderController = async (req, res) => {
+    const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+    } = req.body
 
+    const payment = await paymentModel.findOne({
+        "razorpay.orderId": razorpay_order_id,
+        status: "pending"
+    })
+
+    if (!payment) {
+        return res.status(400).json({
+            message: "Payment not found",
+            success: false
+        })
+    }
+
+    const isPaymentValid = validatePaymentVerification({
+        order_id: razorpay_order_id,
+        payment_id: razorpay_payment_id,
+    }, razorpay_signature, config.RAZORPAY_KEY_SECRET)
+
+    if (!isPaymentValid) {
+        payment.status = "failed"
+        await payment.save()
+
+        return res.status(400).json({
+            message: "Payment verification failed",
+            success: false
+        })
+    }
+
+    payment.status = "paid"
+
+    payment.razorpay.paymentId = razorpay_payment_id
+    payment.razorpay.signature = razorpay_signature
+
+    await payment.save()
+
+    return res.status(200).json({
+        message: "Payment verified successfully",
+        success: true
+    })
+}
 

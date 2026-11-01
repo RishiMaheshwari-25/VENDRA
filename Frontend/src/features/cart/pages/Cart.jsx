@@ -1,7 +1,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useCart } from '../hooks/useCart';
+import { buildOrderItems, markOrderVerified, saveOrderSnapshot } from '../utils/orderSnapshot';
+import { useRazorpay} from "react-razorpay";
+
 import {
   ShoppingBag,
   ArrowLeft,
@@ -90,8 +93,10 @@ const Cart = () => {
   const cartItems = useSelector((state) => state.cart.items);
   const rawSubtotal = useSelector((state) => state.cart.totalPrice);
   const primaryCurrency = useSelector((state) => state.cart.currency);
-  const { handleGetItems, handleCartItemsQantity,handleCartItemsDecrement } = useCart();
-
+  const { handleGetItems, handleCartItemsQantity,handleCartItemsDecrement,handleCreateCartOrder,handleVerifyCartOrder} = useCart();
+  const { Razorpay } = useRazorpay();
+  const user=useSelector(state=>state.auth?.user);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const [promoCode, setPromoCode] = useState('');
@@ -181,7 +186,46 @@ const Cart = () => {
       setUpdatingItemId(null);
     }
   };
+const handleCheckout=async()=>{
+  let order;
+  try {
+    order=await handleCreateCartOrder();
+  } catch (error) {
+    triggerToast(error.response?.data?.message || 'Unable to start checkout.');
+    return;
+  }
+  saveOrderSnapshot(order.id,{ items: buildOrderItems(items), order });
+   const options = {
+      key: "rzp_test_Tun460Jd4kfiqm",
+      amount: order.amount, // Amount in paise
+      currency: order.currency,
+      name: "VENDRA",
+      description: "Order Payment",
+      order_id:order.id, // Generate order_id on server
+      handler: async (response) => {
+           try {
+             const isValid = await handleVerifyCartOrder(response)
+             if (isValid) {
+               markOrderVerified(response.razorpay_order_id, response.razorpay_payment_id)
+               navigate(`/order-success?order_id=${response?.razorpay_order_id}`)
+             }
+           } catch (error) {
+             triggerToast(error.response?.data?.message || 'Payment could not be verified.');
+           }
+          },
+      prefill: {
+        name: user?.fullname || '',
+        email: user?.email || '',
+        contact: user?.contact || '',
+      },
+      theme: {
+        color: "#F37254",
+      },
+    };
 
+    const razorpayInstance = new Razorpay(options);
+    razorpayInstance.open();
+}
   const handleDecreaseQty = async (item) => {
     const productId = item?.product?._id || item?._id;
     const variantId =
@@ -237,10 +281,6 @@ const Cart = () => {
     }
     setPromoApplied(true);
     triggerToast('Promo code applied successfully (10% off).');
-  };
-
-  const handleProceedCheckout = () => {
-    triggerToast('Proceeding to checkout...');
   };
 
   return (
@@ -560,7 +600,7 @@ const Cart = () => {
                 <button
                   type="button"
                   className="v-cart__checkout-btn"
-                  onClick={handleProceedCheckout}
+                  onClick={handleCheckout}
                 >
                   <span>Proceed to Checkout</span>
                   <ArrowRight size={15} />
