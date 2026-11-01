@@ -1,0 +1,260 @@
+@use './variables' as *;
+
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  min-height: 100vh;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+
+  &__art {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 40px;
+    overflow: hidden;
+    background: var(--surface-2);
+
+    @media (max-width: 900px) {
+      display: none;
+    }
+  }
+
+  &__photos {
+    position: absolute;
+    inset: 90px 40px 40px;
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+
+    &--1 {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+    }
+
+    &--2 .auth__photo:nth-child(1) {
+      grid-row: 1 / 3;
+    }
+
+    &--3 .auth__photo:nth-child(1) {
+      grid-row: 1 / 3;
+    }
+
+    &--2 .auth__photo:nth-child(2) {
+      grid-row: 1 / 3;
+      margin-top: 60px;
+    }
+  }
+
+  &__photo {
+    overflow: hidden;
+    background: var(--line);
+    border-radius: var(--r);
+
+    img,
+    .img-fallback {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__brand {
+    position: absolute;
+    top: 36px;
+    left: 40px;
+    z-index: 2;
+    font-family: var(--font-serif);
+    font-size: 24px;
+    letter-spacing: 0.34em;
+
+    &--mobile {
+      display: none;
+      position: static;
+      margin-bottom: 28px;
+
+      @media (max-width: 900px) {
+        display: block;
+      }
+    }
+  }
+
+  &__panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px var(--gutter);
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 420px;
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 4vw, 44px);
+      font-weight: 400;
+      line-height: 1.1;
+    }
+  }
+
+  &__intro {
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__submit {
+    width: 100%;
+    height: 54px;
+    margin-top: 6px;
+  }
+
+  &__google {
+    width: 100%;
+    height: 50px;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 13px;
+  }
+
+  &__or {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--muted);
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+  }
+
+  &__switch {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+
+    a {
+      color: var(--ink);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+
+      &:hover {
+        color: var(--accent);
+      }
+    }
+  }
+
+  &__strength {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+
+    span {
+      display: flex;
+      flex: 1;
+      gap: 4px;
+    }
+
+    i {
+      flex: 1;
+      height: 3px;
+      background: var(--line);
+      border-radius: 2px;
+      transition: background 0.3s ease;
+    }
+
+    small {
+      min-width: 64px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    &[data-level='1'] i:nth-child(-n + 1) {
+      background: var(--danger);
+    }
+
+    &[data-level='2'] i:nth-child(-n + 2) {
+      background: var(--accent);
+    }
+
+    &[data-level='3'] i:nth-child(-n + 3),
+    &[data-level='4'] i:nth-child(-n + 4) {
+      background: var(--olive);
+    }
+  }
+
+  &__seller {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+
+    &.is-on {
+      border-color: var(--ink);
+      background: var(--surface);
+    }
+
+    input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    input:focus-visible + .auth__box {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+  }
+
+  &__box {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    color: transparent;
+    transition: all 0.2s ease;
+  }
+
+  &__seller.is-on &__box {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+}

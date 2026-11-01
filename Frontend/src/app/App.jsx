@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
 import { RouterProvider } from 'react-router'
 import {router} from "./app.routes"
 import { useAuth } from '../features/auth/hooks/auth.hook'
 const App = () => {
     const {handleGetMe}=useAuth();
-    const user=useSelector(state=>state.auth.user)
-    console.log(user);
     useEffect(()=>{
       handleGetMe();
     },[])

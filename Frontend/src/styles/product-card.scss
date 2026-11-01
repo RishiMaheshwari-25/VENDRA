@@ -1,0 +1,154 @@
+@use './variables' as *;
+
+.pc {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+
+  &__media-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: var(--surface-2);
+    border-radius: var(--r);
+  }
+
+  &__media {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  &__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.1s var(--ease), opacity 0.6s ease;
+
+    &--alt {
+      opacity: 0;
+    }
+  }
+
+  &:hover &__img {
+    transform: scale(1.05);
+  }
+
+  &:hover &__img--alt {
+    opacity: 1;
+  }
+
+  &__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 5px 10px;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: var(--r);
+
+    &--low {
+      background: var(--accent);
+      color: #fff;
+    }
+  }
+
+  &__add {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 0;
+    border-radius: var(--r);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transform: translateY(calc(100% + 14px));
+    transition: transform 0.5s var(--ease), background 0.25s ease, color 0.25s ease;
+
+    &:hover {
+      background: var(--ink);
+      color: var(--bg);
+    }
+
+    // Touch screens have no hover: keep the action visible.
+    @media (hover: none) {
+      transform: none;
+    }
+  }
+
+  &:hover &__add,
+  &__add:focus-visible {
+    transform: none;
+  }
+
+  &__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  &__title {
+    @include clamp-lines(2);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+
+    mark {
+      background: var(--accent-soft);
+      color: inherit;
+    }
+  }
+
+  &__info:hover &__title {
+    color: var(--accent);
+  }
+
+  &__price {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+}
+
+// Reusable responsive product grid
+.pgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px 16px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 44px 24px;
+  }
+
+  @media (min-width: 1100px) {
+    &--4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &--skeleton > div {
+    aspect-ratio: 4 / 5;
+    @include shimmer;
+    border-radius: var(--r);
+  }
+}

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { getSellerProduct, createProduct,getAllProducts,getProductDetails,createProductVariant } from "../services/product.api";
 import { useDispatch } from "react-redux";
-import { setSellerProducts, setLoading, setError,setProducts } from "../state/product.slice";
+import { setSellerProducts, setLoading, setError,setProducts,setProductsLoaded } from "../state/product.slice";
 
 export const useProduct = () => { 
   const dispatch = useDispatch();
@@ -48,6 +48,7 @@ export const useProduct = () => {
     } catch (err) {
       console.error("Error in fetching all products:", err);
       dispatch(setError(err?.message || "Failed to fetch products"));
+      dispatch(setProductsLoaded());
       return [];
     } finally {
       dispatch(setLoading(false));

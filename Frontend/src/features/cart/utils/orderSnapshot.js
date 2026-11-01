@@ -3,7 +3,6 @@
 // charged right before Razorpay opens, and OrderSuccess reads it back. normalizeOrder()
 // maps both the snapshot and a future API response onto one view-model.
 
-const FALLBACK_IMAGE = '/images/designer_bomber_jacket.jpg';
 const keyFor = (orderId) => `vendra:order:${orderId}`;
 
 export const getAttributeEntries = (attributes) => {
@@ -122,7 +121,7 @@ export const normalizeOrder = (raw, source) => {
   const items = (raw.items || []).map((it) => ({
     productId: it.productId || null,
     title: it.title || 'Selected piece',
-    image: it.image || firstImageUrl(it.images) || FALLBACK_IMAGE,
+    image: it.image || firstImageUrl(it.images) || null,
     attributes: it.attributes || {},
     quantity: Number(it.quantity) || 1,
     unitPrice: Number(it.unitPrice ?? it.price?.amount) || 0,
@@ -143,4 +142,3 @@ export const normalizeOrder = (raw, source) => {
   };
 };
 
-export { FALLBACK_IMAGE };

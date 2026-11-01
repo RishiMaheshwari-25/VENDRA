@@ -1,6 +1,7 @@
 import Router from "express";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 import { validateAddToCart,validateIncrementCartItemQuantity } from "../validator/cart.validator.js";
+import { getOrderController } from "../controllers/order.controller.js";
 import { addToCart, createOrderCart, decrementItemsByOne, getCart, incrementItemsByOne, verifyOrderController } from "../controllers/cart.controller.js";
 const cartRouter=Router();
 cartRouter.post("/add/:productId/:variantId",authenticateUser,validateAddToCart,addToCart)
@@ -9,4 +10,5 @@ cartRouter.patch("/quantity/increment/:productId/:variantId",authenticateUser,va
 cartRouter.patch("/quantity/decrement/:productId/:variantId",authenticateUser,validateIncrementCartItemQuantity,decrementItemsByOne)
 cartRouter.post("/payment/create/order",authenticateUser,createOrderCart)
 cartRouter.post("/payment/verify/order",authenticateUser,verifyOrderController)
+cartRouter.get("/payment/order/:orderId",authenticateUser,getOrderController)
 export default cartRouter;

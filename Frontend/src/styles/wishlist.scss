@@ -1,0 +1,83 @@
+@use './variables' as *;
+
+.wish {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  border: 0;
+  border-radius: 50%;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+
+  &:hover,
+  &.is-on {
+    color: var(--accent);
+  }
+
+  // On product cards: top-right of the image, shown on hover (always when saved, and on touch).
+  &.pc__wish {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s ease, transform 0.4s var(--ease), color 0.2s ease;
+
+    &.is-on,
+    &:focus-visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (hover: none) {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  &.wish--outline {
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+
+    &:hover {
+      border-color: var(--accent);
+    }
+  }
+}
+
+.pc:hover .pc__wish {
+  opacity: 1;
+  transform: none;
+}
+
+// ── Wishlist page ──
+.wl {
+  padding-top: 40px;
+  padding-bottom: 80px;
+
+  &__head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 36px;
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 400;
+      line-height: 1.1;
+
+      small {
+        font-family: var(--font-sans);
+        font-size: 15px;
+        color: var(--muted);
+      }
+    }
+  }
+}

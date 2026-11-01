@@ -5,7 +5,6 @@ import {
   Check,
   Copy,
   Printer,
-  ShoppingBag,
   ArrowRight,
   ShieldCheck,
   Truck,
@@ -19,29 +18,22 @@ import {
 } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
 import {
-  FALLBACK_IMAGE,
   formatDateTime,
   formatMoney,
-  formatShortDate,
   loadOrderSnapshot,
   normalizeOrder,
 } from '../utils/orderSnapshot';
+import ProductImage from '../../../components/product/ProductImage';
+import { PROMISES } from '../../../config/storefront';
 import '../../../styles/order-success.scss';
 
-// Estimated delivery window, in days after payment. Adjust to match your logistics.
-const DELIVERY_WINDOW_DAYS = [5, 7];
-
 const NEXT_STEPS = [
-  { icon: PackageCheck, title: 'We prepare your order', text: 'Each piece is quality-checked and carefully packed in signature packaging.' },
-  { icon: Truck, title: 'It ships to you', text: 'Your parcel is dispatched with insured courier transit.' },
-  { icon: ShieldCheck, title: 'You enjoy it', text: 'Not quite right? Returns and exchanges are accepted within 7 days.' },
+  { icon: PackageCheck, title: 'We prepare your order', text: 'Your items are checked and packed by the seller.' },
+  { icon: Truck, title: 'It ships to you', text: 'Your parcel is handed to the courier and sent to you.' },
+  { icon: ShieldCheck, title: 'You enjoy it', text: 'Not quite right? Check our returns promise below.' },
 ];
 
-const POLICIES = [
-  { icon: Truck, text: 'Free shipping on all orders with insured courier transit' },
-  { icon: RotateCcw, text: 'Easy 7-day hassle-free returns & exchanges' },
-  { icon: ShieldCheck, text: '100% authentic product verified by our atelier specialists' },
-];
+const POLICY_ICONS = { shipping: Truck, returns: RotateCcw, payment: ShieldCheck };
 
 const OrderSuccess = () => {
   const location = useLocation();
@@ -60,7 +52,7 @@ const OrderSuccess = () => {
         return;
       }
       // Prefer server data (authoritative); fall back to the snapshot saved at checkout.
-      let order = null;
+      let order;
       try {
         const remote = await handleGetOrder(orderId);
         order = normalizeOrder(remote, 'server');
@@ -90,17 +82,6 @@ const OrderSuccess = () => {
     [order]
   );
 
-  const delivery = useMemo(() => {
-    const base = order?.paidAt ? new Date(order.paidAt) : null;
-    if (!base || Number.isNaN(base.getTime())) return null;
-    const [from, to] = DELIVERY_WINDOW_DAYS.map((days) => {
-      const d = new Date(base);
-      d.setDate(d.getDate() + days);
-      return d;
-    });
-    return `${formatShortDate(from)} – ${formatShortDate(to)}`;
-  }, [order]);
-
   const firstName = (user?.fullname || '').trim().split(/\s+/)[0];
 
   const copy = async (value, label) => {
@@ -113,24 +94,8 @@ const OrderSuccess = () => {
   };
 
   const paidOn = formatDateTime(order?.paidAt);
-  const tracker = [
-    { label: 'Order placed', done: confirmed },
-    { label: 'Payment confirmed', done: confirmed },
-    { label: 'Packed', done: false },
-    { label: 'Shipped', done: false },
-    { label: 'Delivered', done: false },
-  ];
-
   return (
     <div className="v-success">
-      <header className="v-success__header">
-        <Link to="/" className="v-success__brand">VENDRA</Link>
-        <Link to="/" className="v-success__header-link">
-          <ShoppingBag size={14} />
-          <span>Continue shopping</span>
-        </Link>
-      </header>
-
       <main className="v-success__main">
         {loading ? (
           <div className="v-success__skeleton" aria-busy="true" aria-label="Loading your order">
@@ -211,24 +176,6 @@ const OrderSuccess = () => {
               </div>
             </section>
 
-            {/* ── Progress ── */}
-            <section className="v-success__card v-success__progress" aria-label="Order progress">
-              <div className="v-success__card-head">
-                <h2>Order progress</h2>
-                {delivery && (
-                  <span className="v-success__eta"><Truck size={14} /> Estimated delivery <strong>{delivery}</strong></span>
-                )}
-              </div>
-              <ol className="v-tracker">
-                {tracker.map((step) => (
-                  <li key={step.label} className={step.done ? 'is-done' : ''}>
-                    <span className="v-tracker__dot">{step.done && <Check size={12} strokeWidth={3} />}</span>
-                    <span className="v-tracker__label">{step.label}</span>
-                  </li>
-                ))}
-              </ol>
-            </section>
-
             <div className="v-success__layout">
               {/* ── Items ── */}
               <section className="v-success__card" aria-label="Items ordered">
@@ -240,14 +187,7 @@ const OrderSuccess = () => {
                   {order.items.map((it, idx) => (
                     <li key={`${it.productId || 'item'}-${idx}`} className="v-item">
                       <div className="v-item__media">
-                        <img
-                          src={it.image}
-                          alt={it.title}
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = FALLBACK_IMAGE;
-                          }}
-                        />
+                        <ProductImage src={it.image} alt={it.title} />
                       </div>
                       <div className="v-item__body">
                         <h3>
@@ -316,27 +256,25 @@ const OrderSuccess = () => {
 
             {/* ── Actions ── */}
             <div className="v-success__actions">
-              <Link to="/" className="v-btn v-btn--solid">
-                <span>Continue shopping</span> <ArrowRight size={14} />
+              <Link to={`/orders/${encodeURIComponent(order.orderId)}`} className="v-btn v-btn--solid">
+                <span>View order</span> <ArrowRight size={14} />
               </Link>
+              <Link to="/orders" className="v-btn v-btn--outline">My orders</Link>
+              <Link to="/" className="v-btn v-btn--outline">Continue shopping</Link>
               <button type="button" className="v-btn v-btn--outline" onClick={() => window.print()}>
                 <Printer size={14} /> <span>Print receipt</span>
               </button>
             </div>
 
             <ul className="v-success__policies">
-              {POLICIES.map(({ icon: Icon, text }) => (
-                <li key={text}><Icon size={16} /> <span>{text}</span></li>
-              ))}
+              {PROMISES.map((p) => {
+                const Icon = POLICY_ICONS[p.key] || ShieldCheck;
+                return <li key={p.key}><Icon size={16} /> <span>{p.long}</span></li>;
+              })}
             </ul>
           </>
         )}
       </main>
-
-      <footer className="v-success__footer">
-        <span className="v-success__footer-brand">VENDRA</span>
-        <span className="v-success__muted">Need help? Quote your order ID when contacting support.</span>
-      </footer>
 
       <div className="v-success__toast" role="status" aria-live="polite">
         {toast && <span>{toast}</span>}
