@@ -11,7 +11,7 @@
     overflow: hidden;
     aspect-ratio: 4 / 5;
     background: var(--surface-2);
-    border-radius: var(--r);
+    border-radius: var(--r-lg);
   }
 
   &__media {
@@ -45,18 +45,23 @@
     position: absolute;
     top: 12px;
     left: 12px;
-    padding: 5px 10px;
+    padding: 5px 12px;
     background: var(--bg);
     color: var(--ink);
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    border-radius: var(--r);
+    border-radius: var(--r-btn);
 
     &--low {
-      background: var(--accent);
-      color: #fff;
+      background: var(--volt);
+      color: #0d0d0d;
+    }
+
+    &--out {
+      background: var(--ink);
+      color: var(--bg);
     }
   }
 
@@ -74,7 +79,7 @@
     background: var(--bg);
     color: var(--ink);
     border: 0;
-    border-radius: var(--r);
+    border-radius: var(--r-btn);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -83,8 +88,8 @@
     transition: transform 0.5s var(--ease), background 0.25s ease, color 0.25s ease;
 
     &:hover {
-      background: var(--ink);
-      color: var(--bg);
+      background: var(--volt);
+      color: #0d0d0d;
     }
 
     // Touch screens have no hover: keep the action visible.
@@ -125,7 +130,8 @@
   &__price {
     flex-shrink: 0;
     font-size: 14px;
-    color: var(--ink-soft);
+    font-weight: 700;
+    color: var(--ink);
   }
 }
 
@@ -149,6 +155,6 @@
   &--skeleton > div {
     aspect-ratio: 4 / 5;
     @include shimmer;
-    border-radius: var(--r);
+    border-radius: var(--r-lg);
   }
 }

@@ -1,31 +1,33 @@
 // ============================================================
 // VENDRA — design tokens, base styles, shared animation primitives.
-// Light by default; dark follows the visitor's system setting.
-// (Add data-theme="light" | "dark" on <html> to force a theme.)
+// Palette: warm cream / ivory / ink, with a forest accent and a volt highlight.
+// Always light. Add data-theme="dark" on <html> to opt into dark.
 // ============================================================
 
 :root {
-  --bg: #faf7f2; // Ivory
-  --surface: #ffffff;
-  --surface-2: #f0eae0; // Bone
-  --ink: #1a1815;
-  --ink-soft: #3a362f;
-  --muted: #6f685d; // Stone
-  --line: #e4ddd0; // Hairline
-  --line-strong: #cfc6b6;
-  --accent: #b5532f; // Clay
-  --accent-soft: #f4e4db;
-  --olive: #3b4a3a;
-  --success: #3b4a3a;
-  --success-soft: rgba(59, 74, 58, 0.12);
-  --danger: #b0443c;
-  --danger-soft: rgba(176, 68, 60, 0.1);
-  --overlay: rgba(26, 24, 21, 0.5);
-  --shadow: 0 24px 64px -24px rgba(26, 24, 21, 0.3);
+  --bg: #efe8d6; // Warm cream
+  --surface: #f9f4e6; // Soft ivory (cards, fields)
+  --surface-2: #e5dcc3; // Sand
+  --ink: #0d0d0d;
+  --ink-soft: #2e2e2b;
+  --muted: #6a634f;
+  --line: #d9cfb3;
+  --line-strong: #bfb28c;
+  --accent: #1e4d3b; // Forest
+  --accent-soft: #dfe5cf;
+  --volt: #d6f24a; // Highlight (always paired with --ink text)
+  --success: #1e6b4a;
+  --success-soft: rgba(30, 107, 74, 0.12);
+  --danger: #b3382c;
+  --danger-soft: rgba(179, 56, 44, 0.1);
+  --overlay: rgba(13, 13, 13, 0.55);
+  --shadow: 0 24px 64px -24px rgba(13, 13, 13, 0.3);
 
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --r: 2px;
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --r: 8px;
+  --r-btn: 999px;
+  --r-lg: 20px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --gutter: 20px;
   --header-h: 72px;
@@ -38,30 +40,23 @@
 }
 
 @mixin dark-tokens {
-  --bg: #121110;
-  --surface: #1b1917;
-  --surface-2: #242120;
-  --ink: #f3efe8;
-  --ink-soft: #d6d0c6;
-  --muted: #a39c90;
-  --line: #2e2b28;
-  --line-strong: #47433d;
-  --accent: #d98a63;
-  --accent-soft: #2e231c;
-  --olive: #8fa68a;
-  --success: #8fa68a;
-  --success-soft: rgba(143, 166, 138, 0.16);
-  --danger: #e0786e;
-  --danger-soft: rgba(224, 120, 110, 0.14);
-  --overlay: rgba(0, 0, 0, 0.66);
-  --shadow: 0 24px 64px -24px rgba(0, 0, 0, 0.75);
+  --bg: #0e0f0d;
+  --surface: #171815;
+  --surface-2: #21231f;
+  --ink: #f4f1ea;
+  --ink-soft: #d9d5c9;
+  --muted: #a29e92;
+  --line: #2b2d28;
+  --line-strong: #44463f;
+  --accent: #8fd1ae;
+  --accent-soft: #1b2b23;
+  --success: #8fd1ae;
+  --success-soft: rgba(143, 209, 174, 0.15);
+  --danger: #ef8d80;
+  --danger-soft: rgba(239, 141, 128, 0.14);
+  --overlay: rgba(0, 0, 0, 0.7);
+  --shadow: 0 24px 64px -24px rgba(0, 0, 0, 0.8);
   color-scheme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    @include dark-tokens;
-  }
 }
 
 :root[data-theme='dark'] {
@@ -138,8 +133,8 @@ select option {
 }
 
 ::selection {
-  background: var(--accent);
-  color: #fff;
+  background: var(--volt);
+  color: #0d0d0d;
 }
 
 :focus-visible {

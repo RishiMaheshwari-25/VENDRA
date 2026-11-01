@@ -68,8 +68,9 @@
     left: 40px;
     z-index: 2;
     font-family: var(--font-serif);
-    font-size: 24px;
-    letter-spacing: 0.34em;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
 
     &--mobile {
       display: none;

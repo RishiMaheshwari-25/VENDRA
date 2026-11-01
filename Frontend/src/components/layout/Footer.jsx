@@ -54,6 +54,7 @@ const Footer = () => {
       <div className="container foot__base">
         <span>© {new Date().getFullYear()} {BRAND}. All rights reserved.</span>
       </div>
+      <span className="foot__mark" aria-hidden="true">{BRAND}</span>
     </footer>
   );
 };

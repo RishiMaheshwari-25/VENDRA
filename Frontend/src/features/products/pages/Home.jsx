@@ -38,8 +38,40 @@ const Hero = ({ slides, isSeller }) => {
   const words = HERO.title.split(' ');
 
   return (
-    <section className={`hero ${current ? '' : 'hero--plain'}`}>
-      <div className="container hero__grid">
+    <section
+      className={`hero ${current ? '' : 'hero--plain'}`}
+      ref={stageRef}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {current && (
+        <div className="hero__bg" aria-hidden="true">
+          <motion.div className="hero__parallax" style={{ y: parallax }}>
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={current._id}
+                className="hero__slide"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.1 }}
+              >
+                <motion.div
+                  className="hero__kenburns"
+                  initial={{ scale: 1.14 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: SLIDE_MS / 1000 + 1.5, ease: 'linear' }}
+                >
+                  <ProductImage src={image} alt="" />
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
+          <div className="hero__shade" />
+        </div>
+      )}
+
+      <div className="container hero__inner">
         <motion.div className="hero__copy" initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.09 } } }}>
           <motion.span className="eyebrow hero__eyebrow" variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}>
             {HERO.eyebrow}
@@ -70,76 +102,44 @@ const Hero = ({ slides, isSeller }) => {
         </motion.div>
 
         {current && (
-          <motion.div
-            className="hero__stage"
-            ref={stageRef}
-            initial={{ opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
-            animate={{ opacity: 1, clipPath: 'inset(0 0 0% 0)' }}
-            transition={{ duration: 1.2, ease: EASE, delay: 0.15 }}
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
-            <motion.div className="hero__parallax" style={{ y: parallax }}>
-              <AnimatePresence initial={false}>
-                <motion.div
-                  key={current._id}
-                  className="hero__slide"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.1 }}
-                >
-                  <motion.div
-                    className="hero__kenburns"
-                    initial={{ scale: 1.14 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: SLIDE_MS / 1000 + 1.5, ease: 'linear' }}
-                  >
-                    <ProductImage src={image} alt={current.title} />
-                  </motion.div>
-                </motion.div>
-              </AnimatePresence>
-            </motion.div>
-
-            <Link to={`/product/${current._id}`} className="hero__caption">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={current._id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.35 }}
-                >
-                  <strong>{current.title}</strong>
-                  <span>{formatPrice(current.price)}</span>
-                </motion.div>
-              </AnimatePresence>
-              <ArrowRight size={16} />
-            </Link>
-
-            {slides.length > 1 && (
-              <div className="hero__dots" role="tablist" aria-label="Featured products">
-                {slides.map((s, i) => (
-                  <button
-                    key={s._id}
-                    type="button"
-                    role="tab"
-                    aria-selected={i === index}
-                    aria-label={`Show ${s.title}`}
-                    className={i === index ? 'is-active' : ''}
-                    onClick={() => setIndex(i)}
-                  >
-                    {i === index && !paused && (
-                      <motion.i key={`${index}-bar`} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: SLIDE_MS / 1000, ease: 'linear' }} />
-                    )}
-                    {i === index && paused && <i style={{ transform: 'scaleX(1)' }} />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </motion.div>
+          <Link to={`/product/${current._id}`} className="hero__caption">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={current._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.35 }}
+              >
+                <strong>{current.title}</strong>
+                <span>{formatPrice(current.price)}</span>
+              </motion.div>
+            </AnimatePresence>
+            <ArrowRight size={16} />
+          </Link>
         )}
       </div>
+
+      {current && slides.length > 1 && (
+        <div className="hero__dots" role="tablist" aria-label="Featured products">
+          {slides.map((s, i) => (
+            <button
+              key={s._id}
+              type="button"
+              role="tab"
+              aria-selected={i === index}
+              aria-label={`Show ${s.title}`}
+              className={i === index ? 'is-active' : ''}
+              onClick={() => setIndex(i)}
+            >
+              {i === index && !paused && (
+                <motion.i key={`${index}-bar`} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: SLIDE_MS / 1000, ease: 'linear' }} />
+              )}
+              {i === index && paused && <i style={{ transform: 'scaleX(1)' }} />}
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 };
@@ -169,9 +169,6 @@ const Home = () => {
     const el = railRef.current;
     if (el) el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
   };
-
-  const { scrollYProgress } = useScroll();
-  const bandBg = useTransform(scrollYProgress, [0.6, 1], ['var(--surface-2)', 'var(--accent-soft)']);
 
   const spotImgs = spotlight ? productGallery(spotlight) : [];
 
@@ -318,7 +315,7 @@ const Home = () => {
 
           {/* Seller call to action (real routes only) */}
           {user?.role !== 'buyer' && (
-            <motion.section className="band" style={{ background: bandBg }}>
+            <motion.section className="band">
               <Reveal className="container band__inner">
                 <h2>{isSeller ? 'Add something new to the store' : 'Sell on Vendra'}</h2>
                 <Link to={isSeller ? '/seller/create-product' : '/register'} className="link-arrow">
