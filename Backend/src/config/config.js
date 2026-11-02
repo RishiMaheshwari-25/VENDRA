@@ -21,6 +21,15 @@ dotenv.config();
   if(!process.env.RAZORPAY_KEY_SECRET){
     throw new Error("Razorpay secret key  is not defined in the environment variable")
   }
+  if(!process.env.REDIS_HOST){
+    throw new Error("REDIS_HOST is not defined in the environment variable")
+  }
+  if(!process.env.REDIS_PORT){
+    throw new Error("REDIS_PORT is not defined in the environment variable")
+  }
+  if(!process.env.REDIS_PASSWORD){
+    throw new Error("REDIS_PASSWORD is not defined in the environment variable")
+  }
 export const config={
     MONGO_URI:process.env.MONGO_URI,
     JWT_SECRET:process.env.JWT_SECRET,
@@ -29,5 +38,8 @@ export const config={
     NODE_ENV:process.env.NODE_ENV,
     IMAGEKIT_PRIVATE_KEY:process.env.IMAGEKIT_PRIVATE_KEY,
     RAZORPAY_KEY_ID:process.env.RAZORPAY_KEY_ID,
-  RAZORPAY_KEY_SECRET:process.env.RAZORPAY_KEY_SECRET
+  RAZORPAY_KEY_SECRET:process.env.RAZORPAY_KEY_SECRET,
+  REDIS_HOST:process.env.REDIS_HOST,
+  REDIS_PORT:process.env.REDIS_PORT,
+  REDIS_PASSWORD:process.env.REDIS_PASSWORD
 }

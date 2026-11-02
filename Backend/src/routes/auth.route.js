@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { registerController,loginController, googleCallback, getMeController } from "../controllers/user.controller.js";
+import { registerController,loginController, googleCallback, getMeController,logoutController } from "../controllers/user.controller.js";
 import { validateRegisterUser,validateLoginUser } from "../validator/auth.validator.js";
 import passport from "passport"
 import { config } from "../config/config.js";
@@ -14,5 +14,6 @@ authRouter.get("/google",
 authRouter.get("/google/callback",
     passport.authenticate("google",{session:false,failureRedirect:config.NODE_ENV=="devlopment"?"http://localhost:5173/login":"/login"}),
 googleCallback)
+authRouter.get("/logout",logoutController)
 
 export default authRouter;

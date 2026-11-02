@@ -1,5 +1,7 @@
-import { register,login,getMe } from "../services/auth.service";
+import { register,login,getMe,logout } from "../services/auth.service";
 import { setUser, setError, setLoading } from "../state/auth.slice";
+import { setCartData } from "../../cart/state/cart.slice";
+import { setWishlist } from "../../wishlist/state/wishlist.slice";
 import { useDispatch, useSelector } from "react-redux";
 
 export const useAuth = () => {
@@ -49,10 +51,19 @@ export const useAuth = () => {
         dispatch(setLoading(false));}
     }
 
+    async function handleLogout(){
+        const data=await logout();
+        dispatch(setUser(null));
+        dispatch(setCartData({items:[],totalPrice:0,currency:null}));
+        dispatch(setWishlist([]));
+        return data;
+    }
+
     return {
         handleRegister,
         handleLogin,
         handleGetMe,
+        handleLogout,
         user,
         loading,
         error

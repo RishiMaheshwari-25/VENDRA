@@ -17,3 +17,7 @@ export const getMe=async()=>{
     const response=await api.get("/get-me");
     return response.data
 }
+export const logout=async()=>{
+    const response=await api.get("/logout");
+    return response.data
+}

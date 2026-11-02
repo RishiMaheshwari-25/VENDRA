@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken"
 import {config} from "../config/config.js"
+import redis from "../dao/cache.js";
 
 export async function sendTokenResponse(user,res,message){
     const token= jwt.sign({
@@ -96,5 +97,24 @@ export async function getMeController(req,res){
             role:user.role
             
         }
+    })
+}
+export async function logoutController(req,res){
+    const token=req.cookies.token;
+    if(!token){
+        return res.status(400).json({
+            message:"User is not logged in"
+        })
+    }
+    res.clearCookie("token");
+   await redis.set(
+        token,
+        "blacklisted",
+        "EX",
+        7 * 24 * 60 * 60
+    );
+    res.status(200).json({
+        message:"User logged out successfully",
+        success:true
     })
 }

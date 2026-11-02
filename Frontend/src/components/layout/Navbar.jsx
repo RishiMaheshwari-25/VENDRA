@@ -1,17 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
 import { AnimatePresence, motion } from 'motion/react';
-import { Heart, LayoutDashboard, Menu, PackageCheck, Search, ShoppingBag, User, X } from 'lucide-react';
+import { Heart, LayoutDashboard, LogOut, Menu, PackageCheck, Search, ShoppingBag, User, X } from 'lucide-react';
 import { BRAND } from '../../config/storefront';
+import { useAuth } from '../../features/auth/hooks/auth.hook';
+import { useToast } from '../ui/toastContext';
 
 const Navbar = ({ onSearch }) => {
   const user = useSelector((state) => state.auth?.user);
   const authLoading = useSelector((state) => state.auth?.loading);
   const cartItems = useSelector((state) => state.cart?.items);
   const wishCount = useSelector((state) => state.wishlist?.items?.length || 0);
+  const { handleLogout } = useAuth();
+  const navigate = useNavigate();
+  const toast = useToast();
   const [scrolled, setScrolled] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const isSeller = user?.role === 'seller';
   const bagCount = useMemo(
@@ -19,6 +25,21 @@ const Navbar = ({ onSearch }) => {
     [cartItems]
   );
   const firstName = (user?.fullname || user?.email || '').split(/[\s@]/)[0];
+
+  const onLogout = async () => {
+    if (logoutLoading) return;
+    setLogoutLoading(true);
+    try {
+      await handleLogout();
+      setDrawer(false);
+      toast('You have been signed out');
+      navigate('/', { replace: true });
+    } catch (error) {
+      toast(error?.response?.data?.message || 'Unable to sign out. Please try again.', 'error');
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -55,7 +76,12 @@ const Navbar = ({ onSearch }) => {
           </button>
 
           {!authLoading && (user ? (
-            <span className="nav__user"><User size={16} /> {firstName}</span>
+            <>
+              <span className="nav__user"><User size={16} /> {firstName}</span>
+              <button type="button" className="nav__link nav__logout" onClick={onLogout} disabled={logoutLoading}>
+                {logoutLoading ? 'Signing out…' : 'Sign out'}
+              </button>
+            </>
           ) : (
             <Link to="/login" className="nav__link nav__signin">Sign in</Link>
           ))}
@@ -155,6 +181,12 @@ const Navbar = ({ onSearch }) => {
               </motion.ul>
 
               {user && <p className="drawer__who"><User size={15} /> Signed in as {user.fullname || user.email}</p>}
+              {user && (
+                <button type="button" className="drawer__logout" onClick={onLogout} disabled={logoutLoading}>
+                  <LogOut size={17} />
+                  {logoutLoading ? 'Signing out…' : 'Sign out'}
+                </button>
+              )}
             </motion.aside>
           </>
         )}
