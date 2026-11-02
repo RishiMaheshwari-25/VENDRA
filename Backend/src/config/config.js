@@ -30,7 +30,17 @@ dotenv.config();
   if(!process.env.REDIS_PASSWORD){
     throw new Error("REDIS_PASSWORD is not defined in the environment variable")
   }
+const isProduction = process.env.NODE_ENV === "production";
+if (isProduction && !process.env.FRONTEND_URL) {
+    throw new Error("FRONTEND_URL is not defined in the environment variable")
+}
+if (isProduction && !process.env.GOOGLE_CALLBACK_URL) {
+    throw new Error("GOOGLE_CALLBACK_URL is not defined in the environment variable")
+}
 export const config={
+    FRONTEND_URL:(process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, ""),
+    GOOGLE_CALLBACK_URL:process.env.GOOGLE_CALLBACK_URL || "/api/auth/google/callback",
+    REDIS_TLS:process.env.REDIS_TLS === "true",
     MONGO_URI:process.env.MONGO_URI,
     JWT_SECRET:process.env.JWT_SECRET,
     GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID,

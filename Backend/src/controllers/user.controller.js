@@ -3,12 +3,20 @@ import jwt from "jsonwebtoken"
 import {config} from "../config/config.js"
 import redis from "../dao/cache.js";
 
+const isProduction = config.NODE_ENV === "production";
+const cookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+};
+
 export async function sendTokenResponse(user,res,message){
     const token= jwt.sign({
         id:user._id,
         email:user.email
     },config.JWT_SECRET,{expiresIn:"7d"})
-    res.cookie("token",token);
+    res.cookie("token",token,cookieOptions);
     res.status(200).json({
         message,
         token,
@@ -31,7 +39,7 @@ export async function registerController(req,res){
             ]
         })
         if(existingUser){
-            res.status(404).json({
+            return res.status(409).json({
                 message:"User with this email or contact already exists"
             })
         }
@@ -53,7 +61,7 @@ export async function loginController(req,res){
         const {email,password}=req.body;
         const user=await userModel.findOne({email});
         if(!user){
-            res.status(400).json({
+            return res.status(400).json({
                 message:"Invalid email or password"
             })
         }
@@ -81,8 +89,8 @@ export async function googleCallback(req,res){
    const token=jwt.sign({
     id:user._id
    },config.JWT_SECRET,{expiresIn:"7d"})
-   res.cookie("token",token);
-    res.redirect("http://localhost:5173/")
+   res.cookie("token",token,cookieOptions);
+    res.redirect(`${config.FRONTEND_URL}/`)
 }
 export async function getMeController(req,res){
     const user=req.user;
@@ -106,7 +114,7 @@ export async function logoutController(req,res){
             message:"User is not logged in"
         })
     }
-    res.clearCookie("token");
+    res.clearCookie("token",{httpOnly:true,secure:isProduction,sameSite:"lax"});
    await redis.set(
         token,
         "blacklisted",

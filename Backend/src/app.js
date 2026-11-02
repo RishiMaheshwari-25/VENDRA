@@ -12,16 +12,19 @@ import orderRouter from "./routes/order.routes.js";
 import wishlistRouter from "./routes/wishlist.routes.js";
 
 const app = express();
-// app.use(cors({
-//     origin:"http://localhost:5173",
-//     methods:['Get','POST','PUT','DELETE'],
-//     credentials:true
-// }))
+app.set("trust proxy", 1);
+app.use(cors({
+    origin:config.FRONTEND_URL,
+    methods:["GET","POST","PUT","PATCH","DELETE"],
+    credentials:true
+}))
+app.get("/health",(req,res)=>res.status(200).json({status:"ok"}))
 app.use(passport.initialize());
 passport.use(new GoogleStrategy({
     clientID:config.GOOGLE_CLIENT_ID,
     clientSecret:config.GOOGLE_CLIENT_SECRET,
-    callbackURL:"/api/auth/google/callback"
+    callbackURL:config.GOOGLE_CALLBACK_URL,
+    proxy:true
 },(accesToken,refreshToken,profile,done)=>{
     return done(null,profile);
 }))
