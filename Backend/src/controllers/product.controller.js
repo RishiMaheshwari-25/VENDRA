@@ -1,6 +1,8 @@
 import productModel from "../models/product.model.js"
 import { uploadFile } from "../services/storage.service.js";
-
+import mongoose from "mongoose";
+import cartModel from "../models/cart.model.js";
+import wishlistModel from "../models/wishlist.model.js";
 export async function createproduct(req,res){
     const {title,description,priceAmount,priceCurrency}=req.body;
     const seller=req.user
@@ -104,4 +106,38 @@ export async function createProductVariant(req,res){
         product
     })
     
+}
+export async function deleteProduct(req,res){
+    const productId=req.params.productId;
+    const product =await productModel.findOneAndDelete({
+        _id:productId,
+        seller:req.user._id
+    })
+    if (!mongoose.isValidObjectId(productId)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid product id"
+        });
+    } 
+    if(!product){
+        return res.status(401).json({
+            message:"Product not found",
+            success:false
+        })
+    }
+    await Promise.all([
+        cartModel.updateMany(
+            { "items.product": productId },
+            { $pull: { items: { product: productId } } }
+        ),
+        wishlistModel.updateMany(
+            { products: productId },
+            { $pull: { products: productId } }
+        )
+    ]);
+    return res.status(200).json({
+        success: true,
+        message: "Product deleted successfully",
+        productId
+    });
 }

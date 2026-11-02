@@ -13,6 +13,11 @@ import { createSlice } from "@reduxjs/toolkit";
             setSellerProducts:(state,action)=>{
                   state.sellerProducts=action.payload
             },
+            removeProduct:(state,action)=>{
+                  const productId=action.payload;
+                  state.sellerProducts=state.sellerProducts.filter(product=>product._id!==productId);
+                  state.products=state.products.filter(product=>product._id!==productId);
+            },
             setProducts:(state,action)=>{
             state.products=action.payload
             state.loaded=true
@@ -28,5 +33,5 @@ import { createSlice } from "@reduxjs/toolkit";
             }
       }
  })
- export const {setSellerProducts,setProducts,setProductsLoaded,setLoading,setError}=productSlice.actions;
+ export const {setSellerProducts,removeProduct,setProducts,setProductsLoaded,setLoading,setError}=productSlice.actions;
  export default productSlice.reducer

@@ -43,3 +43,7 @@ export async function createProductVariant(productId,newProductVariant){
     const response=await api.post(`/${productId}/variant`,formData)
     return response.data
 }
+export async function deleteProduct(productId){
+    const response=await api.delete(`/${productId}`);
+    return response.data;
+}

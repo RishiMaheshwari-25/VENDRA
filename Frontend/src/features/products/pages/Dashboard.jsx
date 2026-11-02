@@ -3,13 +3,14 @@ import { useSelector } from 'react-redux';
 import { selectSellerProducts } from '../../../utils/selectors';
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
-import { Boxes, Grid2x2, Layers, List, Package, Plus, Search, Wallet } from 'lucide-react';
+import { Boxes, Grid2x2, Layers, List, Package, Plus, Search, Trash2, Wallet } from 'lucide-react';
 import { useProduct } from '../hooks/useProduct';
 import ProductImage from '../../../components/product/ProductImage';
 import { Stagger } from '../../../components/ui/Reveal';
 import { fadeUp } from '../../../components/ui/motion';
 import { searchProducts } from '../../search/searchProducts';
 import { formatPrice, productGallery, stockStatus, totalStock } from '../../../utils/product';
+import { useToast } from '../../../components/ui/toastContext';
 import '../../../styles/seller.scss';
 
 const SORTS = {
@@ -22,12 +23,14 @@ const SORTS = {
 const STOCK_LABEL = { none: 'No variants', out: 'Sold out', low: 'Low stock', in: 'In stock' };
 
 const Dashboard = () => {
-  const { handleGetSellerProduct } = useProduct();
+  const { handleGetSellerProduct, handleDeleteProduct } = useProduct();
+  const toast = useToast();
   const products = useSelector(selectSellerProducts);
   const [ready, setReady] = useState(false);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('newest');
   const [view, setView] = useState('grid');
+  const [deletingProductId, setDeletingProductId] = useState(null);
 
   useEffect(() => {
     handleGetSellerProduct().finally(() => setReady(true));
@@ -57,6 +60,21 @@ const Dashboard = () => {
   const valueText = Object.keys(stats.value).length
     ? Object.entries(stats.value).map(([currency, amount]) => formatPrice({ amount, currency })).join(' · ')
     : '—';
+
+  const onDeleteProduct = async (product) => {
+    if (deletingProductId) return;
+    if (!window.confirm(`Delete "${product.title}"? This cannot be undone.`)) return;
+
+    setDeletingProductId(product._id);
+    try {
+      const result = await handleDeleteProduct(product._id);
+      toast(result?.message || 'Product deleted successfully');
+    } catch (error) {
+      toast(error?.response?.data?.message || 'Could not delete the product. Please try again.', 'error');
+    } finally {
+      setDeletingProductId(null);
+    }
+  };
 
   const cards = [
     { icon: Package, label: 'Products', value: products.length },
@@ -131,6 +149,16 @@ const Dashboard = () => {
                 <div className="sd__actions">
                   <Link to={`/seller/product/${p._id}`} className="btn--outline">Manage</Link>
                   <Link to={`/product/${p._id}`} className="link-arrow">View in shop</Link>
+                  <button
+                    type="button"
+                    className="sd__delete"
+                    onClick={() => onDeleteProduct(p)}
+                    disabled={Boolean(deletingProductId)}
+                    aria-label={`Delete ${p.title}`}
+                    title="Delete product"
+                  >
+                    {deletingProductId === p._id ? <span className="spinner" /> : <Trash2 size={17} />}
+                  </button>
                 </div>
               </motion.article>
             );
@@ -140,7 +168,7 @@ const Dashboard = () => {
         <div className="sd__table-wrap">
           <table className="sd__table">
             <thead>
-              <tr><th>Product</th><th>Price</th><th>Variants</th><th>Stock</th><th>Listed</th><th /></tr>
+              <tr><th>Product</th><th>Price</th><th>Variants</th><th>Stock</th><th>Listed</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {list.map((p) => {
@@ -157,7 +185,21 @@ const Dashboard = () => {
                     <td>{p.variants?.length || 0}</td>
                     <td><span className={`sd__tag sd__tag--${status} sd__tag--inline`}>{totalStock(p)} · {STOCK_LABEL[status]}</span></td>
                     <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
-                    <td className="sd__right"><Link to={`/product/${p._id}`} className="link-arrow">Shop</Link></td>
+                    <td className="sd__right">
+                      <div className="sd__table-actions">
+                        <Link to={`/product/${p._id}`} className="link-arrow">Shop</Link>
+                        <button
+                          type="button"
+                          className="sd__delete"
+                          onClick={() => onDeleteProduct(p)}
+                          disabled={Boolean(deletingProductId)}
+                          aria-label={`Delete ${p.title}`}
+                          title="Delete product"
+                        >
+                          {deletingProductId === p._id ? <span className="spinner" /> : <Trash2 size={17} />}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 );
               })}

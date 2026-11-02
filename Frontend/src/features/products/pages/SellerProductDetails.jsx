@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { AnimatePresence, motion } from 'motion/react';
-import { ImagePlus, Layers, Plus, X } from 'lucide-react';
+import { ImagePlus, Layers, Plus, Trash2, X } from 'lucide-react';
 import { useProduct } from '../hooks/useProduct';
 import ProductImage from '../../../components/product/ProductImage';
 import { Stagger } from '../../../components/ui/Reveal';
@@ -21,8 +21,9 @@ const emptyForm = (currency = 'INR') => ({
 });
 
 const SellerProductDetailsInner = ({ productId }) => {
-  const { handleGetProductDetail, handleCreateProductVariant } = useProduct();
+  const { handleGetProductDetail, handleCreateProductVariant, handleDeleteProduct } = useProduct();
   const toast = useToast();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState('loading');
@@ -31,6 +32,7 @@ const SellerProductDetailsInner = ({ productId }) => {
   const [form, setForm] = useState(emptyForm());
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let current = true;
@@ -57,6 +59,21 @@ const SellerProductDetailsInner = ({ productId }) => {
   const closePanel = () => {
     form.images.forEach((i) => URL.revokeObjectURL(i.url));
     setPanel(false);
+  };
+
+  const onDeleteProduct = async () => {
+    if (!window.confirm(`Delete "${product.title}"? This cannot be undone.`)) return;
+
+    setDeleting(true);
+    try {
+      const result = await handleDeleteProduct(productId);
+      toast(result?.message || 'Product deleted successfully');
+      navigate('/seller/dashboard', { replace: true });
+    } catch (error) {
+      toast(error?.response?.data?.message || 'Could not delete the product. Please try again.', 'error');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const setAttr = (index, field, value) =>
@@ -154,7 +171,13 @@ const SellerProductDetailsInner = ({ productId }) => {
             <div><dt>Variants</dt><dd>{variants.length}</dd></div>
             <div><dt>Units in stock</dt><dd>{totalStock(product)}</dd></div>
           </dl>
-          <Link to={`/product/${product._id}`} className="link-arrow">View in shop</Link>
+          <div className="spd__product-actions">
+            <Link to={`/product/${product._id}`} className="link-arrow">View in shop</Link>
+            <button type="button" className="sd__delete" onClick={onDeleteProduct} disabled={deleting || saving}>
+              {deleting ? <span className="spinner" /> : <Trash2 size={16} />}
+              <span>{deleting ? 'Deleting…' : 'Delete product'}</span>
+            </button>
+          </div>
         </div>
       </section>
 

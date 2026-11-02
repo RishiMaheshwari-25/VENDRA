@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { getSellerProduct, createProduct,getAllProducts,getProductDetails,createProductVariant } from "../services/product.api";
+import { getSellerProduct, createProduct,getAllProducts,getProductDetails,createProductVariant,deleteProduct } from "../services/product.api";
 import { useDispatch } from "react-redux";
-import { setSellerProducts, setLoading, setError,setProducts,setProductsLoaded } from "../state/product.slice";
+import { setSellerProducts, removeProduct, setLoading, setError,setProducts,setProductsLoaded } from "../state/product.slice";
 
 export const useProduct = () => { 
   const dispatch = useDispatch();
@@ -63,5 +63,17 @@ export const useProduct = () => {
     return data;
   }
 
-  return { handleCreateProduct, handleGetSellerProduct,handleGetAllProducts ,handleGetProductDetail,handleCreateProductVariant};
+  async function handleDeleteProduct(productId) {
+    try {
+      dispatch(setError(null));
+      const data = await deleteProduct(productId);
+      dispatch(removeProduct(productId));
+      return data;
+    } catch (err) {
+      dispatch(setError(err?.response?.data?.message || err?.message || "Failed to delete product"));
+      throw err;
+    }
+  }
+
+  return { handleCreateProduct, handleGetSellerProduct,handleGetAllProducts ,handleGetProductDetail,handleCreateProductVariant,handleDeleteProduct};
 };
