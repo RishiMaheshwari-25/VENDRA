@@ -11,11 +11,9 @@ A full-stack multi-vendor e-commerce platform built with the MERN stack, designe
 
 ## 🌐 Live Demo
 
-- **Frontend:** https://vendra-woad.vercel.app
-- **Backend API:** https://vendra-kxjb.onrender.com
-- **GitHub Repository:** [VENDRA](https://github.com/RishiMaheshwari-25/VENDRA)
+- **Live Link:** https://vendra-woad.vercel.app
+  - **GitHub Repository:** [VENDRA](https://github.com/RishiMaheshwari-25/VENDRA)
 
-> Replace the frontend URL above with your actual Vercel deployment URL if it is different.
 
 ## 📌 About the Project
 
